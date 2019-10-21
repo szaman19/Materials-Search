@@ -115,11 +115,12 @@ def func(files):
 	reference_set.add("Cu")
 	reference_set.add("Fe")
 
-	return_val = list()
+	return_val = []
 	for f in files:
 		structure = cif_structure(f)
 		u_elements = num_species(structure)
 		if(u_elements.issubset(reference_set)):
+			# print(f)
 			return_val.append(f)
 	return return_val
 
@@ -127,7 +128,9 @@ def func(files):
 def main():
 	os.chdir("../data/structure_11660/")
 	files = glob.glob("*.cif")
+
 	print(len(files))
+	print(type(files))
 	
 
 	# structure = cif_structure(files[0])
@@ -169,8 +172,8 @@ def main():
 
 	file_chunks = [ files[int((num_files/Num_Processes) * i): int((num_files / Num_Processes * (i+1)))] for i in range(Num_Processes)]
 
-	# for each in file_chunks:
-		# print(len(each))
+	for each in file_chunks:
+		print(each)
 	pool = Pool(processes=Num_Processes)
 	results = [pool.apply_async(func, args=(file_chunks[i],)) for i in range(Num_Processes)]
 	output = [p.get() for p in results]
@@ -178,7 +181,7 @@ def main():
 	log = open("files.log","w")
 
 	for returned_list in output:
-		for each in reference_set:
+		for each in returned_list:
 			log.write(each)
 			log.write("\n")
 	log.close()
