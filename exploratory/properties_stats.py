@@ -10,10 +10,10 @@ def main():
 
 	# for col in dataframe.columns:
 	# 	print(col)
-	# print(dataframe.describe())
-	pd.DataFrame.hist(dataframe, column=["LCD","PLD"], grid=False, sharey=True)
+	print(dataframe[dataframe.columns[:5]].describe())
+	# pd.DataFrame.hist(dataframe, column=["LCD","PLD"], grid=False, sharey=True)
 	# plt.xlabel("LCD")
-	plt.ylabel("# Number of Structures")
-	plt.show()
+	# plt.ylabel("# Number of Structures")
+	# plt.show()
 
 main()

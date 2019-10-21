@@ -104,12 +104,12 @@ def main():
 	print(len(files))
 	
 
-	structure = cif_structure(files[0])
+	# structure = cif_structure(files[0])
 	# gen_3d_Plot(structure)
-	x_min= x_max=y_min=y_max=z_min= z_max = 0
-	x_min,x_max,y_min,y_max,z_min, z_max = min_max_dataset(files)
+	# x_min= x_max=y_min=y_max=z_min= z_max = 0
+	# x_min,x_max,y_min,y_max,z_min, z_max = min_max_dataset(files)
 
-	print(x_min,x_max,y_min,y_max,z_min, z_max)
+	# print(x_min,x_max,y_min,y_max,z_min, z_max)
 	# structure = cif_structure(files[10])
 	# distance_matrix = structure.distance_matrix
 	# print(files[0])
@@ -121,9 +121,20 @@ def main():
 	# total_unique_species = set()
 
 	# file_write = open("sizes.dat","w")
-	# for file in files:
-	# 	structure = cif_structure(file)
-	# 	u_elements = num_elements(structure)
+	elements = {}
+	for file in files:
+		structure = cif_structure(file)
+		u_elements = num_species(structure)
+		# print(u_elements)
+		for each in u_elements:
+			if(each in elements):
+				elements[each] += 1
+			else:
+				elements[each] = 1
+
+	for each in elements.keys():
+		print(each, elements[each])
+
 	# 	# total_unique_species.union(u_elements)
 	# 	file_write.write(file)
 	# 	file_write.write(" ")
