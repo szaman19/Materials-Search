@@ -116,11 +116,11 @@ def func(files):
 	reference_set.add("Fe")
 
 	return_val = list()
-	for file in files:
-		structure = cif_structure(file)
+	for f in files:
+		structure = cif_structure(f)
 		u_elements = num_species(structure)
 		if(u_elements.issubset(reference_set)):
-			return_val.append(file)
+			return_val.append(f)
 	return return_val
 
 
@@ -163,7 +163,7 @@ def main():
 	reference_set.add("Fe")
 
 
-	Num_Processes = 10
+	Num_Processes = 20
 
 	num_files = len(files)
 
@@ -171,7 +171,7 @@ def main():
 
 	# for each in file_chunks:
 		# print(len(each))
-	pool = Pool(processes=NUM_PROCESS)
+	pool = Pool(processes=Num_Processes)
 	results = [pool.apply_async(func, args=(file_chunks[i],)) for i in range(Num_Processes)]
 	output = [p.get() for p in results]
 
