@@ -7,6 +7,8 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from multiprocessing import Pool
+
 '''
 Given a structure, find the number of unique elements present
 and return a list of elements
@@ -98,6 +100,30 @@ def min_max_dataset(dataset):
 		y_max = bigger(y_max,y_max_s)
 		z_max = bigger(z_max,z_max_s)
 	return x_min,x_max,y_min,y_max,z_min, z_max
+
+def func(files):
+	reference_set = set()
+	reference_set.add("H")
+	reference_set.add("N")
+	reference_set.add("C")
+	reference_set.add("O")
+	reference_set.add("Co")
+	reference_set.add("P")
+	reference_set.add("Zn")
+	reference_set.add("Ag")
+	reference_set.add("Cd")
+	reference_set.add("Cu")
+	reference_set.add("Fe")
+
+	return_val = list()
+	for file in files:
+		structure = cif_structure(file)
+		u_elements = num_species(structure)
+		if(u_elements.issubset(reference_set)):
+			return_val.append(file)
+	return return_val
+
+
 def main():
 	os.chdir("../data/structure_11660/")
 	files = glob.glob("*.cif")
@@ -122,18 +148,52 @@ def main():
 
 	# file_write = open("sizes.dat","w")
 	elements = {}
-	for file in files:
-		structure = cif_structure(file)
-		u_elements = num_species(structure)
-		# print(u_elements)
-		for each in u_elements:
-			if(each in elements):
-				elements[each] += 1
-			else:
-				elements[each] = 1
 
-	for each in elements.keys():
-		print(each, elements[each])
+	reference_set = set()
+	reference_set.add("H")
+	reference_set.add("N")
+	reference_set.add("C")
+	reference_set.add("O")
+	reference_set.add("Co")
+	reference_set.add("P")
+	reference_set.add("Zn")
+	reference_set.add("Ag")
+	reference_set.add("Cd")
+	reference_set.add("Cu")
+	reference_set.add("Fe")
+
+
+	Num_Processes = 10
+
+	num_files = len(files)
+
+	file_chunks = [ files[int((num_files/Num_Processes) * i): int((num_files / Num_Processes * (i+1)))] for i in range(Num_Processes)]
+
+	# for each in file_chunks:
+		# print(len(each))
+	results = [pool.apply_async(func, args=(file_chunks[i],)) for i in range(Num_Processes)]
+	output = [p.get() for p in results]
+
+	log = open("files.log","w")
+
+	for returned_list in output:
+		for each in reference_set:
+			log.write(each)
+			log.write("\n")
+	log.close()
+	# for file in files:
+	# 	structure = cif_structure(file)
+
+	# 	u_elements = num_species(structure)
+	# 	# print(u_elements)
+	# 	for each in u_elements:
+	# 		if(each in elements):
+	# 			elements[each] += 1
+	# 		else:
+	# 			elements[each] = 1
+
+	# for each in elements.keys():
+	# 	print(each, elements[each])
 
 	# 	# total_unique_species.union(u_elements)
 	# 	file_write.write(file)
