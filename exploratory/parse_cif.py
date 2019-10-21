@@ -171,6 +171,7 @@ def main():
 
 	# for each in file_chunks:
 		# print(len(each))
+	pool = Pool(processes=NUM_PROCESS)
 	results = [pool.apply_async(func, args=(file_chunks[i],)) for i in range(Num_Processes)]
 	output = [p.get() for p in results]
 
