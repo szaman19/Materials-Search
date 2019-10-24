@@ -1,5 +1,6 @@
 venv/
 data/
+gcn_model/data/
 
 *.ics
 *.cif
