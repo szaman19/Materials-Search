@@ -13,7 +13,7 @@ class Net(torch.nn.Module):
 		super(Net, self).__init__()
 		
 		#channel in is  size of input features, channel out is 128
-		self.conv1 = GraphConv(num_features, 128) 
+		self.conv1 = GraphConv(11, 128) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.8
 		self.pool1 = TopKPooling(128, ratio=0.8)
@@ -32,7 +32,7 @@ class Net(torch.nn.Module):
 		self.lin2 = torch.nn.Linear(128,64)
 		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
 
-	def forward(self, forward):
+	def forward(self, data):
 		x, edge_index, batch = data.x, data.edge_index, data.batch
 
 	
@@ -55,17 +55,58 @@ class Net(torch.nn.Module):
 		x = F.dropout(x, p=0.5, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
+		return x
 
 def main():
+	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
+	loader = DataLoader(training_data_list, batch_size = 1)
 
-	loader = DataLoader(training_data_list, batch_size = 16, shuffle = True)
-
-	print(len(loader))
+	# print(len(loader))
+	# for data in loader:
+		# print(type(data.weight))
 	# training_data_obj.one_hot_test(4,"Co")
-	# model = Net(11)
-	# criterion = torch.nn.MSELoss()
-	# optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
+	model = Net(11)
+	criterion = torch.nn.MSELoss()
+	optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
+	epoch = 40
+	print("Starting Training:")
+	print("*"*40)
+	for i in range(epoch):
+
+		training_loss = 0
+		for data in loader:
+			data = data.to(device)
+			optimizer.zero_grad()
+			out = model(data)
+			loss = criterion(out, torch.unsqueeze(data.y,1))
+			# print(loss.item())
+			training_loss += loss.item()
+			loss.backward()
+			optimizer.step()
+		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader))
+
+
+	print("*" * 40)
+	print("Starting Test: ")
+	print("*" * 40)
+
+
+	test_dl = MOFDataset.MOFDataset(train=False).get_data()
+
+	test_loader = DataLoader(test_dl, batch_size=1)
+
+	total_loss = 0
+	for test_data in test_loader:
+		data = data.to(device)
+		with torch.no_grad():
+			pred= model(data)
+		loss = criterion(pred, torch.unsqueeze(test_data.y))
+		total_loss += loss.item()
+	print("MSE for test is: ", total_loss / len(test_loader))
+
+
 	
 if __name__ == '__main__':
 	main()

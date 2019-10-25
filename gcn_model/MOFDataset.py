@@ -39,20 +39,21 @@ class MOFDataset():
 				file  = labels['filename'][counter]
 				structure = self.cif_structure(directory+file+".cif")
 				distance_matrix = structure.distance_matrix
-				graph = nx.from_numpy_matrix(distance_matrix)
+
+				graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
 				num_nodes = distance_matrix.shape[0]
 				# print(num_nodes)
 				feature_matrix = self.get_feature_matrix(structure)
 				
 				data = torch_geometric.utils.from_networkx(graph)
-				data.x = torch.from_numpy(feature_matrix)
+				# data.x = torch.tensor(feature_matrix, dtype=torch.double)
+				data.x = torch.zeros(num_nodes,11)
 				data.y = labels['LCD'][counter]	
-
 				dataset.append(data)
 				counter +=1
-
 			else:
 				print("Not ok skipping: ", file)
+		return dataset
 
 	def cif_structure(self,file_name):
 		parser = CifParser(file_name)
