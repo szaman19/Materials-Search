@@ -67,7 +67,7 @@ def main():
 	# for data in loader:
 		# print(type(data.weight))
 	# training_data_obj.one_hot_test(4,"Co")
-	model = Net(11)
+	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
 	epoch = 40

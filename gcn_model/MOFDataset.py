@@ -48,7 +48,9 @@ class MOFDataset():
 				data = torch_geometric.utils.from_networkx(graph)
 				# data.x = torch.tensor(feature_matrix, dtype=torch.double)
 				data.x = torch.zeros(num_nodes,11)
-				data.y = labels['LCD'][counter]	
+				data.y = labels['LCD'][counter]
+				if counter == 100:
+					break	
 				dataset.append(data)
 				counter +=1
 			else:
