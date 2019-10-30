@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import torch_geometric.utils
 import networkx as nx
-
+from multiprocessing import Pool
 
 class MOFDataset():
 	"""docstring for MOFDataset"""
@@ -33,28 +33,49 @@ class MOFDataset():
 		counter = 0
 
 		# print(feature_matrix)
+		size = len(labels['filename'])
+		steps = int(size / 10)
+		
+		arr = [x for x in range(0,size, steps)]
 
-		for file in labels['filename']:
-			if(os.path.exists(directory+file+".cif")):
-				file  = labels['filename'][counter]
-				structure = self.cif_structure(directory+file+".cif")
-				distance_matrix = structure.distance_matrix
+		pool = Pool(processes=10)
+		resuls = [pool.apply_async(self.get_data_helper, args=(labels,arr[i],arr[i] + steps, size, )) for i in range(len(arr))]
 
-				graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
-				num_nodes = distance_matrix.shape[0]
-				# print(num_nodes)
-				feature_matrix = self.get_feature_matrix(structure)
+		dataset = []
+
+		for vals in resuls:
+			vals = vals.get()
+			for each in vals:
+				dataset.append(each)
+		print(dataset)
+
+
+
+
+
+
+
+		# for file in labels['filename']:
+		# 	if(os.path.exists(directory+file+".cif")):
+				# file  = labels['filename'][counter]
+				# structure = self.cif_structure(directory+file+".cif")
+				# distance_matrix = structure.distance_matrix
+
+				# graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+				# num_nodes = distance_matrix.shape[0]
+				# # print(num_nodes)
+				# feature_matrix = self.get_feature_matrix(structure)
 				
-				data = torch_geometric.utils.from_networkx(graph)
-				# data.x = torch.tensor(feature_matrix, dtype=torch.double)
-				data.x = torch.zeros(num_nodes,11)
-				data.y = labels['LCD'][counter]
-				if counter == 100:
-					break	
-				dataset.append(data)
-				counter +=1
-			else:
-				print("Not ok skipping: ", file)
+				# data = torch_geometric.utils.from_networkx(graph)
+				# # data.x = torch.tensor(feature_matrix, dtype=torch.double)
+				# data.x = torch.zeros(num_nodes,11)
+				# data.y = labels['LCD'][counter]
+				# if counter == 100:
+				# 	break	
+				# dataset.append(data)
+				# counter +=1
+		# 	else:
+		# 		print("Not ok skipping: ", file)
 		return dataset
 
 	def cif_structure(self,file_name):
@@ -83,6 +104,30 @@ class MOFDataset():
 			vec = self.one_hot_encode(str(each.specie))
 			arr.append(vec)
 		return np.array(arr)
+
+	def get_data_helper(self, labels, counter_start, counter_end, size):
+		dataset = []
+		for x in range(counter_start,counter_end):
+			if (x == size):
+				break
+			file  = labels['filename'][x]
+			structure = self.cif_structure(directory+file+".cif")
+			distance_matrix = structure.distance_matrix
+
+			graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+			num_nodes = distance_matrix.shape[0]
+			# print(num_nodes)
+			feature_matrix = self.get_feature_matrix(structure)
+			
+			data = torch_geometric.utils.from_networkx(graph)
+			# data.x = torch.tensor(feature_matrix, dtype=torch.double)
+			data.x = torch.zeros(num_nodes,11)
+			data.y = labels['LCD'][x]
+			dataset.append(data)
+			# dataset.append(x)
+
+		return dataset
+
 
 
 
