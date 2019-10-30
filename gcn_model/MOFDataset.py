@@ -54,8 +54,8 @@ class MOFDataset():
 				distance_matrix = structure.distance_matrix
 
 				num_nodes = distance_matrix.shape[0]
-
-				if (num_nodes < 40):
+				print(num_nodes)
+				if (num_nodes < 50):
 					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
 					num_nodes = distance_matrix.shape[0]
 					# print(num_nodes)
