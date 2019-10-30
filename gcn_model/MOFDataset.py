@@ -39,15 +39,15 @@ class MOFDataset():
 		
 		arr = [x for x in range(0,size, steps)]
 
-		pool = Pool(processes=20)
-		resuls = [pool.apply_async(self.get_data_helper, args=(labels,arr[i],arr[i] + steps, size, )) for i in range(len(arr))]
+		with Pool(processes=20) as pool:
+			resuls = [pool.apply_async(self.get_data_helper, args=(labels,arr[i],arr[i] + steps, size, )) for i in range(len(arr))]
 
-		dataset = []
+			dataset = []
 
-		for vals in resuls:
-			vals = vals.get()
-			for each in vals:
-				dataset.append(each)
+			for vals in resuls:
+				vals = vals.get()
+				for each in vals:
+					dataset.append(each)
 		# print(dataset)
 		# for file in labels['filename']:
 		# 	if(os.path.exists(directory+file+".cif")):
