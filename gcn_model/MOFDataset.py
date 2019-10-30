@@ -23,6 +23,8 @@ class MOFDataset():
 		""" returns a list of Data objects """
 		# print(type(directory)) 
 		# files = glob.glob(self.data_dir+"*.cif")
+		directory = os.getcwd() + self.data_dir
+
 		labels = pd.read_csv(directory+"properties.csv")
 		# counter = 1
 
