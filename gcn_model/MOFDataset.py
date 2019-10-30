@@ -47,6 +47,7 @@ class MOFDataset():
 		# 		for each in vals:
 		# 			dataset.append(each)
 		# print(dataset)
+
 		for file in labels['filename']:
 			if(os.path.exists(directory+file+".cif")):
 				file  = labels['filename'][counter]
@@ -59,7 +60,7 @@ class MOFDataset():
 					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
 					num_nodes = distance_matrix.shape[0]
 					# print(num_nodes)
-					feature_matrix = self.get_feature_matrix(structure)
+					feature_matrix = self.get_structuresfeature_matrix(structure)
 					
 					data = torch_geometric.utils.from_networkx(graph)
 					# data.x = torch.tensor(feature_matrix, dtype=torch.double)
@@ -71,7 +72,7 @@ class MOFDataset():
 				counter +=1
 			else:
 				print("Not ok skipping: ", file)
-			if counter == 3:
+			if len(dataset) == 3:
 						break	
 		return dataset
 
