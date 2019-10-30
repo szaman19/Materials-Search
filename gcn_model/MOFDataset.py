@@ -21,7 +21,6 @@ class MOFDataset():
 
 	def get_data(self):
 		""" returns a list of Data objects """
-		directory = os.getcwd() + self.data_dir
 		# print(type(directory)) 
 		# files = glob.glob(self.data_dir+"*.cif")
 		labels = pd.read_csv(directory+"properties.csv")
@@ -110,6 +109,8 @@ class MOFDataset():
 		for x in range(counter_start,counter_end):
 			if (x == size):
 				break
+			directory = os.getcwd() + self.data_dir
+
 			file  = labels['filename'][x]
 			structure = self.cif_structure(directory+file+".cif")
 			distance_matrix = structure.distance_matrix
