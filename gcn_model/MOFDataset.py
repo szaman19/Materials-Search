@@ -34,40 +34,40 @@ class MOFDataset():
 		counter = 0
 
 		# print(feature_matrix)
-		size = len(labels['filename'])
-		steps = int(size / 20)
+		# size = len(labels['filename'])
+		# steps = int(size / 20)
 		
-		arr = [x for x in range(0,size, steps)]
+		# arr = [x for x in range(0,size, steps)]
 
-		with Pool(processes=20) as pool:
-			dataset = []
-			for i in range(20):
-				resuls = pool.map(self.get_data_helper, args=(labels,arr[i],arr[i] + steps, size, )) 
-				vals = resuls.get()
-				for each in vals:
-					dataset.append(each)
+		# with Pool(processes=20) as pool:
+		# 	dataset = []
+		# 	for i in range(20):
+		# 		resuls = pool.map(self.get_data_helper, args=(labels,arr[i],arr[i] + steps, size, )) 
+		# 		vals = resuls.get()
+		# 		for each in vals:
+		# 			dataset.append(each)
 		# print(dataset)
-		# for file in labels['filename']:
-		# 	if(os.path.exists(directory+file+".cif")):
-				# file  = labels['filename'][counter]
-				# structure = self.cif_structure(directory+file+".cif")
-				# distance_matrix = structure.distance_matrix
+		for file in labels['filename']:
+			if(os.path.exists(directory+file+".cif")):
+				file  = labels['filename'][counter]
+				structure = self.cif_structure(directory+file+".cif")
+				distance_matrix = structure.distance_matrix
 
-				# graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
-				# num_nodes = distance_matrix.shape[0]
-				# # print(num_nodes)
-				# feature_matrix = self.get_feature_matrix(structure)
+				graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+				num_nodes = distance_matrix.shape[0]
+				# print(num_nodes)
+				feature_matrix = self.get_feature_matrix(structure)
 				
-				# data = torch_geometric.utils.from_networkx(graph)
-				# # data.x = torch.tensor(feature_matrix, dtype=torch.double)
-				# data.x = torch.zeros(num_nodes,11)
-				# data.y = labels['LCD'][counter]
-				# if counter == 100:
-				# 	break	
-				# dataset.append(data)
-				# counter +=1
-		# 	else:
-		# 		print("Not ok skipping: ", file)
+				data = torch_geometric.utils.from_networkx(graph)
+				# data.x = torch.tensor(feature_matrix, dtype=torch.double)
+				data.x = torch.zeros(num_nodes,11)
+				data.y = labels['LCD'][counter]
+				if counter == 100:
+					break	
+				dataset.append(data)
+				counter +=1
+			else:
+				print("Not ok skipping: ", file)
 		return dataset
 
 	def cif_structure(self,file_name):
