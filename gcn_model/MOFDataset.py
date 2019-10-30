@@ -55,7 +55,7 @@ class MOFDataset():
 
 				num_nodes = distance_matrix.shape[0]
 
-				if (num_nodes < 10):
+				if (num_nodes < 35):
 					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
 					num_nodes = distance_matrix.shape[0]
 					# print(num_nodes)
