@@ -63,10 +63,7 @@ def main():
 	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 	loader = DataLoader(training_data_list, batch_size = 1)
 
-	# print(len(loader))
-	# for data in loader:
-		# print(type(data.weight))
-	# training_data_obj.one_hot_test(4,"Co")
+
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
@@ -98,10 +95,10 @@ def main():
 	test_loader = DataLoader(test_dl, batch_size=1)
 
 	model.eval()
-	
+
 	total_loss = 0
 	for test_data in test_loader:
-		data = data.to(device)
+		data = test_data.to(device)
 		with torch.no_grad():
 			pred= model(data)
 		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
