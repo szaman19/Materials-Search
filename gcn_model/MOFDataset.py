@@ -65,13 +65,14 @@ class MOFDataset():
 					# data.x = torch.tensor(feature_matrix, dtype=torch.double)
 					data.x = torch.zeros(num_nodes,11)
 					data.y = labels['LCD'][counter]
-					if counter == 3:
-						break	
+					
 					dataset.append(data)
 					print(counter)
 				counter +=1
 			else:
 				print("Not ok skipping: ", file)
+			if counter == 3:
+						break	
 		return dataset
 
 	def cif_structure(self,file_name):
