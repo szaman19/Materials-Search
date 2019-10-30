@@ -55,7 +55,7 @@ class MOFDataset():
 
 				num_nodes = distance_matrix.shape[0]
 
-				if (num_nodes < 35):
+				if (num_nodes < 40):
 					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
 					num_nodes = distance_matrix.shape[0]
 					# print(num_nodes)
@@ -65,7 +65,7 @@ class MOFDataset():
 					# data.x = torch.tensor(feature_matrix, dtype=torch.double)
 					data.x = torch.zeros(num_nodes,11)
 					data.y = labels['LCD'][counter]
-					if counter == 10:
+					if counter == 3:
 						break	
 					dataset.append(data)
 					counter +=1
