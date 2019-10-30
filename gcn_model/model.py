@@ -66,8 +66,8 @@ def main():
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
-	optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
-	epoch = 400
+	optimizer = torch.optim.Adam(model.parameters(), lr=1E-5)
+	epoch = 2000
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
@@ -101,6 +101,7 @@ def main():
 		data = test_data.to(device)
 		with torch.no_grad():
 			pred= model(data)
+                        print(pred)
 		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 		total_loss += loss.item()
 	print("MSE for test is: ", total_loss / len(test_loader))
