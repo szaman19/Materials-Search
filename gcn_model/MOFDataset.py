@@ -42,7 +42,7 @@ class MOFDataset():
 		with Pool(processes=20) as pool:
 			dataset = []
 			for i in range(20):
-				resuls = pool.apply_async(self.get_data_helper, args=(labels,arr[i],arr[i] + steps, size, )) 
+				resuls = pool.map(self.get_data_helper, args=(labels,arr[i],arr[i] + steps, size, )) 
 				vals = resuls.get()
 				for each in vals:
 					dataset.append(each)
