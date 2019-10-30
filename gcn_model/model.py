@@ -97,6 +97,8 @@ def main():
 
 	test_loader = DataLoader(test_dl, batch_size=1)
 
+	model.eval()
+	
 	total_loss = 0
 	for test_data in test_loader:
 		data = data.to(device)
