@@ -68,8 +68,8 @@ class MOFDataset():
 					if counter == 3:
 						break	
 					dataset.append(data)
-					counter +=1
 					print(counter)
+				counter +=1
 			else:
 				print("Not ok skipping: ", file)
 		return dataset
