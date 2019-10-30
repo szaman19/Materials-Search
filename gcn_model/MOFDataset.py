@@ -62,8 +62,8 @@ class MOFDataset():
 				# data.x = torch.tensor(feature_matrix, dtype=torch.double)
 				data.x = torch.zeros(num_nodes,11)
 				data.y = labels['LCD'][counter]
-				# if counter == 100:
-				# 	break	
+				if counter == 10:
+					break	
 				dataset.append(data)
 				counter +=1
 			else:
