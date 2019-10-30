@@ -35,11 +35,11 @@ class MOFDataset():
 
 		# print(feature_matrix)
 		size = len(labels['filename'])
-		steps = int(size / 10)
+		steps = int(size / 20)
 		
 		arr = [x for x in range(0,size, steps)]
 
-		pool = Pool(processes=10)
+		pool = Pool(processes=20)
 		resuls = [pool.apply_async(self.get_data_helper, args=(labels,arr[i],arr[i] + steps, size, )) for i in range(len(arr))]
 
 		dataset = []
@@ -48,14 +48,7 @@ class MOFDataset():
 			vals = vals.get()
 			for each in vals:
 				dataset.append(each)
-		print(dataset)
-
-
-
-
-
-
-
+		# print(dataset)
 		# for file in labels['filename']:
 		# 	if(os.path.exists(directory+file+".cif")):
 				# file  = labels['filename'][counter]
