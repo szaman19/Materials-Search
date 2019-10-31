@@ -61,8 +61,8 @@ class MOFDataset():
 					feature_matrix = self.get_feature_matrix(structure)
 					
 					data = torch_geometric.utils.from_networkx(graph)
-					# data.x = torch.tensor(feature_matrix, dtype=torch.double)
-					data.x = torch.zeros(num_nodes,11)
+					data.x = torch.tensor(feature_matrix, dtype=torch.double)
+					# data.x = torch.zeros(num_nodes,11)
 					data.y = labels['LCD'][counter]
 					print(file, num_nodes, labels['LCD'][counter])
 					
@@ -82,8 +82,8 @@ class MOFDataset():
 
 	def one_hot_encode(self, element):
 		elements = ["H","N","C","O","Co","P","Zn","Ag","Cd","Cu","Fe"]
-
-		one_hot_vector = np.zeros(len(elements))
+		one_hot_vector = torch.zeros(num_nodes,11)
+		# one_hot_vector = np.zeros(len(elements))
 		one_hot_vector[elements.index(element)] = 1
 		return one_hot_vector
 
