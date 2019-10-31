@@ -46,9 +46,14 @@ class MOFDataset():
 			pool = Pool(processes=num_processes)
 			results = [pool.apply_async(self.get_data_helper, args=(labels,i+x)) for x in range(num_processes)]
 			out = [p.get() for p in results]
+
+			for each in out:
+				dataset.append(each)
 			pool.close()
 
-			print(out) 
+			print("Data Loaded: ", i+20,"/",size)
+
+			# print(out) 
 
 
 
@@ -126,29 +131,25 @@ class MOFDataset():
 		return feature_matrix
 
 	def get_data_helper(self, labels, counter):
-		# dataset = []
-		# for x in range(counter_start,counter_end):
-		# 	if (x == size):
-		# 		break
-		# 	directory = os.getcwd() + self.data_dir
+		x = counter
+		directory = os.getcwd() + self.data_dir
 
-		# 	file  = labels['filename'][x]
-		# 	structure = self.cif_structure(directory+file+".cif")
-		# 	distance_matrix = structure.distance_matrix
+		file  = labels['filename'][x]
+		structure = self.cif_structure(directory+file+".cif")
+		distance_matrix = structure.distance_matrix
 
-		# 	graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
-		# 	num_nodes = distance_matrix.shape[0]
-		# 	# print(num_nodes)
-		# 	feature_matrix = self.get_feature_matrix(structure)
+		graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+		num_nodes = distance_matrix.shape[0]
+			# print(num_nodes)
+		feature_matrix = self.get_feature_matrix(structure)
 			
-		# 	data = torch_geometric.utils.from_networkx(graph)
-		# 	# data.x = torch.tensor(feature_matrix, dtype=torch.double)
-		# 	data.x = torch.zeros(num_nodes,11)
-		# 	data.y = labels['LCD'][x]
-		# 	dataset.append(data)
-			# dataset.append(x)
+		data = torch_geometric.utils.from_networkx(graph)
+			# data.x = torch.tensor(feature_matrix, dtype=torch.double)
+		data.x = torch.zeros(num_nodes,11)
+		data.y = labels['LCD'][x]
+		# 
 
-		return counter
+		return data
 
 
 
