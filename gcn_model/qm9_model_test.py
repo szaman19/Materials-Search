@@ -101,9 +101,9 @@ def main():
 
 	# print(dataset.data.y)
 	# Normalize targets to mean = 0 and std = 1.
-	mean = dataset.data.y[:, target].mean().item()
-	std = dataset.data.y[:, target].std().item()
-	dataset.data.y[:, target] = (dataset.data.y[:, target] - mean) / std
+	mean = dataset.data.y.mean().item()
+	std = dataset.data.y.std().item()
+	dataset.data.y = (dataset.data.y - mean) / std
 
 	# Split datasets.
 	# test_dataset = dataset[:10000]
