@@ -61,51 +61,51 @@ def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
-	# loader = DataLoader(training_data_list, batch_size = 1)
+	loader = DataLoader(training_data_list, batch_size = 1)
 
 
-	# model = Net(11).to(device)
-	# criterion = torch.nn.MSELoss()
-	# optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
-	# epoch = 2000
-	# print("Starting Training:")
-	# print("*"*40)
-	# for i in range(epoch):
+	model = Net(11).to(device)
+	criterion = torch.nn.MSELoss()
+	optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
+	epoch = 2000
+	print("Starting Training:")
+	print("*"*40)
+	for i in range(epoch):
 
-	# 	training_loss = 0
-	# 	for data in loader:
-	# 		data = data.to(device)
-	# 		optimizer.zero_grad()
-	# 		out = model(data)
-	# 		loss = criterion(out, torch.unsqueeze(data.y,1))
-	# 		# print(loss.item())
-	# 		training_loss += loss.item()
-	# 		loss.backward()
-	# 		optimizer.step()
-	# 	print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader))
-
-
-	# print("*" * 40)
-	# print("Starting Test: ")
-	# print("*" * 40)
+		training_loss = 0
+		for data in loader:
+			data = data.to(device)
+			optimizer.zero_grad()
+			out = model(data)
+			loss = criterion(out, torch.unsqueeze(data.y,1))
+			# print(loss.item())
+			training_loss += loss.item()
+			loss.backward()
+			optimizer.step()
+		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader))
 
 
-	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
+	print("*" * 40)
+	print("Starting Test: ")
+	print("*" * 40)
 
-	# test_loader = DataLoader(test_dl, batch_size=3)
 
-	# model.eval()
+	test_dl = MOFDataset.MOFDataset(train=False).get_data()
 
-	# total_loss = 0
-	# for test_data in test_loader:
-	# 	data = test_data.to(device)
-	# 	with torch.no_grad():
-	# 		pred= model(data)
-	# 		print(pred)
-	# 		print(torch.unsqueeze(test_data.y,1))
-	# 	loss = criterion(pred, torch.unsqueeze(test_data.y,1))
-	# 	total_loss += loss.item()
-	# print("MSE for test is: ", total_loss / len(test_loader))
+	test_loader = DataLoader(test_dl, batch_size=3)
+
+	model.eval()
+
+	total_loss = 0
+	for test_data in test_loader:
+		data = test_data.to(device)
+		with torch.no_grad():
+			pred= model(data)
+			print(pred)
+			print(torch.unsqueeze(test_data.y,1))
+		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
+		total_loss += loss.item()
+	print("MSE for test is: ", total_loss / len(test_loader))
 
 
 	

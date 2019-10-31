@@ -34,7 +34,8 @@ class MOFDataset():
 		counter = 0
 
 
-		size = len(labels['filename'])
+		# size = len(labels['filename'])
+		size = 199
 		print(size)
 
 		for i in range(0,size, 20):
