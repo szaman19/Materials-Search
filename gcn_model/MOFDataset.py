@@ -34,11 +34,19 @@ class MOFDataset():
 		counter = 0
 
 
-		for i in range(0,len(labels['filename']), 20):
-			
-			pool = Pool(processes=20)
-			results = [pool.apply_async(self.get_data_helper, args=(labels,i+x)) for x in range(20)]
+		size = len(labels['filename'])
+		print(size)
+		for i in range(0,size, 20):
+			num_processes  = 0
+			if (size > i + 20 ):
+				num_processes = 20
+			else:
+				num_processes = size - i
+
+			pool = Pool(processes=num_processes)
+			results = [pool.apply_async(self.get_data_helper, args=(labels,i+x)) for x in range(num_processes)]
 			out = [p.get() for p in results]
+			pool.close()
 
 			print(out) 
 
