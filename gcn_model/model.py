@@ -13,18 +13,18 @@ class Net(torch.nn.Module):
 		super(Net, self).__init__()
 		
 		#channel in is  size of input features, channel out is 128
-		self.conv1 = GraphConv(11, 128) 
+		self.conv1 = GCNConv(11, 128) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.8
 		self.pool1 = TopKPooling(128, ratio=0.8)
 		
 		#channel in is 128. channel out is 128
-		self.conv2 = GraphConv(128,128)
+		self.conv2 = GCNConv(128,128)
 
 		#channel in is 128, channel out is 128. Ratio is 0.8
 		self.pool2 = TopKPooling(128, ratio=0.8)
 
-		self.conv3 = GraphConv(128, 128)
+		self.conv3 = GCNConv(128, 128)
 
 		self.pool3 = TopKPooling(128, ratio=0.8)
 
@@ -66,7 +66,7 @@ def main():
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
-	optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
+	optimizer = torch.optim.Adam(model.parameters(), lr=1E-6)
 	epoch = 20
 	print("Starting Training:")
 	print("*"*40)
@@ -102,6 +102,7 @@ def main():
 		with torch.no_grad():
 			pred= model(data)
 			print(pred)
+			print(torch.unsqueeze(test_data.y,1))
 		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 		total_loss += loss.item()
 	print("MSE for test is: ", total_loss / len(test_loader))
