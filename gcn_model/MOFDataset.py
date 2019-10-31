@@ -39,6 +39,7 @@ class MOFDataset():
 		# size = 199
 		print(size)
 
+		pool = Pool(processes=40)
 		for i in range(0,size, 40):
 			num_processes  = 0
 			if (size > i + 40):
@@ -46,7 +47,6 @@ class MOFDataset():
 			else:
 				num_processes = size - i
 
-			pool = Pool(processes=num_processes)
 			results = [pool.apply_async(self.get_data_helper, args=(labels,i+x)) for x in range(num_processes)]
 			out = [p.get() for p in results]
 
