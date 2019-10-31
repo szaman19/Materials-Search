@@ -39,10 +39,10 @@ class MOFDataset():
 		# size = 199
 		print(size)
 
-		for i in range(0,size, 36):
+		for i in range(0,size, 40):
 			num_processes  = 0
-			if (size > i + 36 ):
-				num_processes = 36
+			if (size > i + 40):
+				num_processes = 40
 			else:
 				num_processes = size - i
 
@@ -53,7 +53,7 @@ class MOFDataset():
 			for each in out:
 				dataset.append(each)
 			pool.close()
-
+			pool.join()
 			print("Data Loaded: ", i+num_processes,"/",size)
 
 			# print(out) 
@@ -105,6 +105,7 @@ class MOFDataset():
 	def cif_structure(self,file_name):
 		parser = CifParser(file_name)
 		structure = parser.get_structures()[0]
+		parse.close()
 		return structure	
 
 	def one_hot_encode(self, element):
