@@ -95,7 +95,7 @@ class Net(torch.nn.Module):
 def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-	# path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', 'QM9')
+	path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', 'QM9')
 	transform = T.Compose([MyTransform(), Complete(), T.Distance(norm=False)])
 	dataset = QM9(path, transform=MyTransform).shuffle()
 
