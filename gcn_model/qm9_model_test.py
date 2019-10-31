@@ -99,6 +99,7 @@ def main():
 	transform = T.Compose([MyTransform(), Complete(), T.Distance(norm=False)])
 	dataset = QM9(path, transform=MyTransform).shuffle()
 
+	print(dataset.data.y)
 	# Normalize targets to mean = 0 and std = 1.
 	# mean = dataset.data.y[:, target].mean().item()
 	# std = dataset.data.y[:, target].std().item()
