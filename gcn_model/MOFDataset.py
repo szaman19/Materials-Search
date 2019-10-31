@@ -105,7 +105,7 @@ class MOFDataset():
 	def cif_structure(self,file_name):
 		parser = CifParser(file_name)
 		structure = parser.get_structures()[0]
-		parse.close()
+		# parse.close()
 		return structure	
 
 	def one_hot_encode(self, element):
