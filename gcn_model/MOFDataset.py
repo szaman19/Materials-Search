@@ -36,6 +36,7 @@ class MOFDataset():
 
 		size = len(labels['filename'])
 		print(size)
+
 		for i in range(0,size, 20):
 			num_processes  = 0
 			if (size > i + 20 ):
@@ -141,11 +142,11 @@ class MOFDataset():
 		graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
 		num_nodes = distance_matrix.shape[0]
 			# print(num_nodes)
-		feature_matrix = self.get_feature_matrix(structure)
+		feature_matrix = self.get_feature_matrix(structure,num_nodes)
 			
 		data = torch_geometric.utils.from_networkx(graph)
 			# data.x = torch.tensor(feature_matrix, dtype=torch.double)
-		data.x = torch.zeros(num_nodes,11)
+		data.x = feature_matrix
 		data.y = labels['LCD'][x]
 		# 
 
