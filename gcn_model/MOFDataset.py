@@ -36,8 +36,8 @@ class MOFDataset():
 
 
 		size = len(labels['filename'])
-		# size = 199
-		print(size)
+		size = 300
+		# print(size)
 
 		pool = Pool(processes=40)
 		for i in range(0,size, 40):
