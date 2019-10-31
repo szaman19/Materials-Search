@@ -61,7 +61,7 @@ def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
-	loader = DataLoader(training_data_list, batch_size = 1)
+	loader = DataLoader(training_data_list, batch_size = 16)
 
 
 	model = Net(11).to(device)

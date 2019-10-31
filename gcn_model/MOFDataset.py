@@ -7,7 +7,8 @@ import numpy as np
 import torch_geometric.utils
 import networkx as nx
 from multiprocessing import Pool
-
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 class MOFDataset():
 	"""docstring for MOFDataset"""
 	def __init__(self, 
@@ -34,14 +35,14 @@ class MOFDataset():
 		counter = 0
 
 
-		# size = len(labels['filename'])
-		size = 199
+		size = len(labels['filename'])
+		# size = 199
 		print(size)
 
-		for i in range(0,size, 20):
+		for i in range(0,size, 36):
 			num_processes  = 0
-			if (size > i + 20 ):
-				num_processes = 20
+			if (size > i + 36 ):
+				num_processes = 36
 			else:
 				num_processes = size - i
 
@@ -53,7 +54,7 @@ class MOFDataset():
 				dataset.append(each)
 			pool.close()
 
-			print("Data Loaded: ", i+20,"/",size)
+			print("Data Loaded: ", i+num_processes,"/",size)
 
 			# print(out) 
 
