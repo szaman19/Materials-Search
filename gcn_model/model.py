@@ -52,7 +52,7 @@ class Net(torch.nn.Module):
 
 		
 		x = F.relu(self.lin1(x))
-		x = F.dropout(x, p=0.9, training = self.training)
+		x = F.dropout(x, p=1, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
 		return x
@@ -61,13 +61,13 @@ def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
-	loader = DataLoader(training_data_list, batch_size = 3)
+	loader = DataLoader(training_data_list, batch_size = 1)
 
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
-	optimizer = torch.optim.Adam(model.parameters(), lr=1E-6)
-	epoch = 20
+	optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
+	epoch = 2000
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
