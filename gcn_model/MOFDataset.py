@@ -33,11 +33,21 @@ class MOFDataset():
 
 		counter = 0
 
+
+		for i in range(0,len(labels['filename']), 20):
+			
+			pool = Pool(processes=20)
+			results = [pool.apply_async(self.get_data_helper, args=(labels,i+x)) for x in range(20)]
+			out = [p.get() for p in results]
+
+			print(out) 
+
+
+
+
+
 		# print(feature_matrix)
 		# size = len(labels['filename'])
-		# steps = int(size / 20)
-		
-		# arr = [x for x in range(0,size, steps)]
 
 		# with Pool(processes=20) as pool:
 		# 	dataset = []
@@ -47,33 +57,33 @@ class MOFDataset():
 		# 		for each in vals:
 		# 			dataset.append(each)
 		# print(dataset)
-		for file in labels['filename']:
-			if(os.path.exists(directory+file+".cif")):
-				file  = labels['filename'][counter]
-				structure = self.cif_structure(directory+file+".cif")
-				distance_matrix = structure.distance_matrix
+		# for file in labels['filename']:
+		# 	if(os.path.exists(directory+file+".cif")):
+		# 		file  = labels['filename'][counter]
+		# 		structure = self.cif_structure(directory+file+".cif")
+		# 		distance_matrix = structure.distance_matrix
 
-				num_nodes = distance_matrix.shape[0]
-				if (num_nodes < 50):
-					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
-					num_nodes = distance_matrix.shape[0]
-					# print(num_nodes)
-					feature_matrix = self.get_feature_matrix(structure, num_nodes)
+		# 		num_nodes = distance_matrix.shape[0]
+		# 		if (num_nodes < 50):
+		# 			graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+		# 			num_nodes = distance_matrix.shape[0]
+		# 			# print(num_nodes)
+		# 			feature_matrix = self.get_feature_matrix(structure, num_nodes)
 					
-					data = torch_geometric.utils.from_networkx(graph)
-					# data.x = torch.tensor(feature_matrix, dtype=torch.double)
-					data.x = torch.zeros(num_nodes,11)
-					# data.x = feature_matrix
-					data.y = labels['LCD'][counter]
-					print(file, num_nodes, labels['LCD'][counter])
+		# 			data = torch_geometric.utils.from_networkx(graph)
+		# 			# data.x = torch.tensor(feature_matrix, dtype=torch.double)
+		# 			data.x = torch.zeros(num_nodes,11)
+		# 			# data.x = feature_matrix
+		# 			data.y = labels['LCD'][counter]
+		# 			print(file, num_nodes, labels['LCD'][counter])
 					
-					dataset.append(data)
-					# print(counter)
-				counter +=1
-			else:
-				print("Not ok skipping: ", file)
-			if(len(dataset) ==3):
-				break
+		# 			dataset.append(data)
+		# 			# print(counter)
+		# 		counter +=1
+		# 	else:
+		# 		print("Not ok skipping: ", file)
+		# 	if(len(dataset) ==3):
+		# 		break
 		return dataset
 
 	def cif_structure(self,file_name):
@@ -107,30 +117,30 @@ class MOFDataset():
 			counter +=1
 		return feature_matrix
 
-	def get_data_helper(self, labels, counter_start, counter_end, size):
-		dataset = []
-		for x in range(counter_start,counter_end):
-			if (x == size):
-				break
-			directory = os.getcwd() + self.data_dir
+	def get_data_helper(self, labels, counter):
+		# dataset = []
+		# for x in range(counter_start,counter_end):
+		# 	if (x == size):
+		# 		break
+		# 	directory = os.getcwd() + self.data_dir
 
-			file  = labels['filename'][x]
-			structure = self.cif_structure(directory+file+".cif")
-			distance_matrix = structure.distance_matrix
+		# 	file  = labels['filename'][x]
+		# 	structure = self.cif_structure(directory+file+".cif")
+		# 	distance_matrix = structure.distance_matrix
 
-			graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
-			num_nodes = distance_matrix.shape[0]
-			# print(num_nodes)
-			feature_matrix = self.get_feature_matrix(structure)
+		# 	graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+		# 	num_nodes = distance_matrix.shape[0]
+		# 	# print(num_nodes)
+		# 	feature_matrix = self.get_feature_matrix(structure)
 			
-			data = torch_geometric.utils.from_networkx(graph)
-			# data.x = torch.tensor(feature_matrix, dtype=torch.double)
-			data.x = torch.zeros(num_nodes,11)
-			data.y = labels['LCD'][x]
-			dataset.append(data)
+		# 	data = torch_geometric.utils.from_networkx(graph)
+		# 	# data.x = torch.tensor(feature_matrix, dtype=torch.double)
+		# 	data.x = torch.zeros(num_nodes,11)
+		# 	data.y = labels['LCD'][x]
+		# 	dataset.append(data)
 			# dataset.append(x)
 
-		return dataset
+		return counter
 
 
 
