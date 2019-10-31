@@ -2,13 +2,11 @@ import os.path as osp
 import torch 
 import torch.nn.functional as F
 import torch_geometric.transforms as T
-from torch_geometric.data import DataLoader
 from torch_geometric.nn import GCNConv, TopKPooling
 from torch_geometric.nn import global_mean_pool as gap
 from torch_geometric.nn import global_max_pool as gmp
-
 from torch_geometric.datasets import QM9
-# from torch_geometric.data import DataLoader
+from torch_geometric.data import DataLoader
 from torch_geometric.utils import remove_self_loops
 
 target = 0
@@ -102,9 +100,9 @@ def main():
 	dataset = QM9(path, transform=transform).shuffle()
 
 	# Normalize targets to mean = 0 and std = 1.
-	mean = dataset.data.y[:, target].mean().item()
-	std = dataset.data.y[:, target].std().item()
-	dataset.data.y[:, target] = (dataset.data.y[:, target] - mean) / std
+	# mean = dataset.data.y[:, target].mean().item()
+	# std = dataset.data.y[:, target].std().item()
+	# dataset.data.y[:, target] = (dataset.data.y[:, target] - mean) / std
 
 	# Split datasets.
 	test_dataset = dataset[:10000]
