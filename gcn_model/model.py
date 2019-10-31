@@ -29,8 +29,8 @@ class Net(torch.nn.Module):
 		self.pool3 = TopKPooling(128, ratio=0.8)
 
 		self.lin1 = torch.nn.Linear(256, 128)
-		self.lin2 = torch.nn.Linear(128,64)
-		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
+		self.lin2 = torch.nn.Linear(128,256)
+		self.lin3 = torch.nn.Linear(256, 1) #Continuous output
 
 	def forward(self, data):
 		x, edge_index, batch = data.x, data.edge_index, data.batch
@@ -52,7 +52,7 @@ class Net(torch.nn.Module):
 
 		
 		x = F.relu(self.lin1(x))
-		x = F.dropout(x, p=0.5, training = self.training)
+		x = F.dropout(x, p=0.9, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
 		return x
@@ -61,12 +61,12 @@ def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
-	loader = DataLoader(training_data_list, batch_size = 1)
+	loader = DataLoader(training_data_list, batch_size = 3)
 
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
-	optimizer = torch.optim.Adam(model.parameters(), lr=1E-4)
+	optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
 	epoch = 20
 	print("Starting Training:")
 	print("*"*40)
@@ -92,7 +92,7 @@ def main():
 
 	test_dl = MOFDataset.MOFDataset(train=False).get_data()
 
-	test_loader = DataLoader(test_dl, batch_size=1)
+	test_loader = DataLoader(test_dl, batch_size=3)
 
 	model.eval()
 
