@@ -95,9 +95,9 @@ class Net(torch.nn.Module):
 def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-	path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', 'QM9')
+	# path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', 'QM9')
 	transform = T.Compose([MyTransform(), Complete(), T.Distance(norm=False)])
-	dataset = QM9(path, transform=transform).shuffle()
+	dataset = QM9(path, transform=MyTransform).shuffle()
 
 	# Normalize targets to mean = 0 and std = 1.
 	# mean = dataset.data.y[:, target].mean().item()
@@ -105,59 +105,59 @@ def main():
 	# dataset.data.y[:, target] = (dataset.data.y[:, target] - mean) / std
 
 	# Split datasets.
-	test_dataset = dataset[:10000]
-	val_dataset = dataset[10000:20000]
-	train_dataset = dataset[20000:]
+	# test_dataset = dataset[:10000]
+	# val_dataset = dataset[10000:20000]
+	# train_dataset = dataset[20000:]
 	
-	test_loader = DataLoader(test_dataset, batch_size=64)
-	val_loader = DataLoader(val_dataset, batch_size=64)
-	train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+	# test_loader = DataLoader(test_dataset, batch_size=64)
+	# val_loader = DataLoader(val_dataset, batch_size=64)
+	# train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
 
 
-	model = Net(dataset.num_features).to(device)
+	# model = Net(dataset.num_features).to(device)
 
-	criterion = torch.nn.MSELoss()
-	optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
-	epoch = 200
+	# criterion = torch.nn.MSELoss()
+	# optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
+	# epoch = 200
 	
-	print("Starting Training:")
-	print("*"*40)
-	for i in range(epoch):
+	# print("Starting Training:")
+	# print("*"*40)
+	# for i in range(epoch):
 
-		training_loss = 0
-		for data in loader:
-			data = data.to(device)
-			optimizer.zero_grad()
-			out = model(data)
-			loss = criterion(out, torch.unsqueeze(data.y,1))
-			# print(loss.item())
-			training_loss += loss.item()
-			loss.backward()
-			optimizer.step()
-		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader))
-
-
-	print("*" * 40)
-	print("Starting Test: ")
-	print("*" * 40)
+	# 	training_loss = 0
+	# 	for data in loader:
+	# 		data = data.to(device)
+	# 		optimizer.zero_grad()
+	# 		out = model(data)
+	# 		loss = criterion(out, torch.unsqueeze(data.y,1))
+	# 		# print(loss.item())
+	# 		training_loss += loss.item()
+	# 		loss.backward()
+	# 		optimizer.step()
+	# 	print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader))
 
 
-	test_dl = MOFDataset.MOFDataset(train=False).get_data()
+	# print("*" * 40)
+	# print("Starting Test: ")
+	# print("*" * 40)
 
-	test_loader = DataLoader(test_dl, batch_size=3)
 
-	model.eval()
+	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 
-	total_loss = 0
-	for test_data in test_loader:
-		data = test_data.to(device)
-		with torch.no_grad():
-			pred= model(data)
-			print(pred)
-			print(torch.unsqueeze(test_data.y,1))
-		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
-		total_loss += loss.item()
-	print("MSE for test is: ", total_loss / len(test_loader))
+	# test_loader = DataLoader(test_dl, batch_size=3)
+
+	# model.eval()
+
+	# total_loss = 0
+	# for test_data in test_loader:
+	# 	data = test_data.to(device)
+	# 	with torch.no_grad():
+	# 		pred= model(data)
+	# 		print(pred)
+	# 		print(torch.unsqueeze(test_data.y,1))
+	# 	loss = criterion(pred, torch.unsqueeze(test_data.y,1))
+	# 	total_loss += loss.item()
+	# print("MSE for test is: ", total_loss / len(test_loader))
 
 
 	
