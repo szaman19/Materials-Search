@@ -91,16 +91,16 @@ class MOFDataset():
 				data.x = torch.zeros(num_nodes,11)
 					# data.x = feature_matrix
 				data.y = labels['LCD'][counter]
-				print(file, num_nodes, labels['LCD'][counter])
+				# print(file, num_nodes, labels['LCD'][counter])
 					
 				dataset.append(data)
 				
-				print(counter)
+				print("Elements loaded: ",counter, "/", size)
 				counter +=1
 			else:
 				print("Not ok skipping: ", file)
-			if(len(dataset) ==3):
-				break
+			# if(len(dataset) ==3):
+			# 	break
 		return dataset
 
 	def cif_structure(self,file_name):
