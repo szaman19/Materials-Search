@@ -82,7 +82,7 @@ class MOFDataset():
 
 	def one_hot_encode(self, element):
 		elements = ["H","N","C","O","Co","P","Zn","Ag","Cd","Cu","Fe"]
-		one_hot_vector = torch.zeros(num_nodes,11)
+		one_hot_vector = torch.zeros(1,11)
 		# one_hot_vector = np.zeros(len(elements))
 		one_hot_vector[elements.index(element)] = 1
 		return one_hot_vector
