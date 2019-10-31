@@ -62,8 +62,8 @@ class MOFDataset():
 					
 					data = torch_geometric.utils.from_networkx(graph)
 					# data.x = torch.tensor(feature_matrix, dtype=torch.double)
-					# data.x = torch.zeros(num_nodes,11)
-					data.x = feature_matrix
+					data.x = torch.zeros(num_nodes,11)
+					# data.x = feature_matrix
 					data.y = labels['LCD'][counter]
 					print(file, num_nodes, labels['LCD'][counter])
 					
