@@ -58,11 +58,12 @@ class MOFDataset():
 					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
 					num_nodes = distance_matrix.shape[0]
 					# print(num_nodes)
-					feature_matrix = self.get_feature_matrix(structure)
+					feature_matrix = self.get_feature_matrix(structure, num_nodes)
 					
 					data = torch_geometric.utils.from_networkx(graph)
-					data.x = torch.tensor(feature_matrix, dtype=torch.double)
+					# data.x = torch.tensor(feature_matrix, dtype=torch.double)
 					# data.x = torch.zeros(num_nodes,11)
+					data.x = feature_matrix
 					data.y = labels['LCD'][counter]
 					print(file, num_nodes, labels['LCD'][counter])
 					
@@ -82,10 +83,10 @@ class MOFDataset():
 
 	def one_hot_encode(self, element):
 		elements = ["H","N","C","O","Co","P","Zn","Ag","Cd","Cu","Fe"]
-		one_hot_vector = torch.zeros(1,11)
+		# one_hot_vector = torch.zeros(1,11)
 		# one_hot_vector = np.zeros(len(elements))
-		one_hot_vector[elements.index(element)] = 1
-		return one_hot_vector
+		# one_hot_vector[elements.index(element)] = 1
+		return elements.index(element)
 
 	def one_hot_test(self, val = 0, element="H"):
 		one_hot = self.one_hot_encode(element)
@@ -95,12 +96,16 @@ class MOFDataset():
 		true_val[val] = 1
 		print(true_val)
 		print(true_val == self.one_hot_encode(element))
-	def get_feature_matrix(self, structure):
-		arr = []
+	def get_feature_matrix(self, structure, num_nodes):
+		feature_matrix = torch.zeros(num_nodes,11)
+		counter = 0
 		for each in structure.sites:
-			vec = self.one_hot_encode(str(each.specie))
-			arr.append(vec)
-		return np.array(arr)
+			# vec = self.one_hot_encode(str(each.specie))
+			# arr.append(vec)
+			index = self.one_hot_encode(str(each.specie))
+			feature_matrix[counter][index] = 1
+			counter +=1
+		return feature_matrix
 
 	def get_data_helper(self, labels, counter_start, counter_end, size):
 		dataset = []
