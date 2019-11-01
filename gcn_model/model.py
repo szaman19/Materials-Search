@@ -13,7 +13,7 @@ class Net(torch.nn.Module):
 		super(Net, self).__init__()
 		
 		#channel in is  size of input features, channel out is 128
-		self.conv1 = GCNConv(11, 128) 
+		self.conv1 = GCNConv(1, 128) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.8
 		self.pool1 = TopKPooling(128, ratio=0.8)
