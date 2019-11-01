@@ -29,8 +29,8 @@ class Net(torch.nn.Module):
 		self.pool3 = TopKPooling(128, ratio=0.8)
 
 		self.lin1 = torch.nn.Linear(256, 128)
-		self.lin2 = torch.nn.Linear(128,256)
-		self.lin3 = torch.nn.Linear(256, 1) #Continuous output
+		self.lin2 = torch.nn.Linear(128,64)
+		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
 
 	def forward(self, data):
 		x, edge_index, batch = data.x, data.edge_index, data.batch
