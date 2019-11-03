@@ -96,6 +96,7 @@ class MOFDataset():
 				dataset.append(data)
 				
 				print("Elements loaded: ",counter, "/", size)
+
 				counter +=1
 			else:
 				print("Not ok skipping: ", file)

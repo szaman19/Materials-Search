@@ -1,10 +1,13 @@
 import torch 
 import torch.nn.functional as F
 from torch_geometric.data import DataLoader
-from torch_geometric.nn import GCNConv, TopKPooling
+from torch_geometric.nn import GraphConv, TopKPooling
 from torch_geometric.nn import global_mean_pool as gap
 from torch_geometric.nn import global_max_pool as gmp
 
+import matplotlib.pyplot as plt
+
+import numpy as np
 import MOFDataset
 
 class Net(torch.nn.Module):
@@ -13,18 +16,18 @@ class Net(torch.nn.Module):
 		super(Net, self).__init__()
 		
 		#channel in is  size of input features, channel out is 128
-		self.conv1 = GCNConv(1, 128) 
+		self.conv1 = GraphConv(1, 128) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.8
 		self.pool1 = TopKPooling(128, ratio=0.8)
 		
 		#channel in is 128. channel out is 128
-		self.conv2 = GCNConv(128,128)
+		self.conv2 = GraphConv(128,128)
 
 		#channel in is 128, channel out is 128. Ratio is 0.8
 		self.pool2 = TopKPooling(128, ratio=0.8)
 
-		self.conv3 = GCNConv(128, 128)
+		self.conv3 = GraphConv(128, 128)
 
 		self.pool3 = TopKPooling(128, ratio=0.8)
 
@@ -67,7 +70,7 @@ def main():
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
-	epoch = 2000
+	epoch = 2
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
@@ -97,15 +100,36 @@ def main():
 	model.eval()
 
 	total_loss = 0
+
+	vals = []
 	for test_data in test_loader:
 		data = test_data.to(device)
 		with torch.no_grad():
 			pred= model(data)
-			print(pred)
-			print(torch.unsqueeze(test_data.y,1))
+			vals.append((pred,torch.unsqueeze(test_data.y,1) ))
+			# print(pred)
+			# print(torch.unsqueeze(test_data.y,1))
 		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 		total_loss += loss.item()
 	print("MSE for test is: ", total_loss / len(test_loader))
+
+	vals.sort(key=lambda tup:tup[1])
+
+	actuals = []
+	pred = []
+
+	for each in vals:
+		actuals.append(each[1])
+		pred.append(each[0])
+	indices = np.arange(len(actuals))
+
+	plt.bar(indices, actuals, color="b", label="Actuals")
+	plt.bar(indices, pred, color="r", label="Predicted")
+
+	plt.legend()
+	plt.savefig("actualsvpredicted.png", format="png")
+
+
 
 
 	
