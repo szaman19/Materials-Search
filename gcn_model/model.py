@@ -70,7 +70,7 @@ def main():
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
-	epoch = 2
+	epoch = 50
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
@@ -118,16 +118,28 @@ def main():
 	actuals = []
 	pred = []
 
+	# print(vals)
+
+	log = open("vals.log",'w')
 	for each in vals:
-		actuals.append(each[1])
-		pred.append(each[0])
+		print(each[0][0].item(), each[1][0].item())
+		
+		actuals.append(each[1][0])
+		pred.append(each[0][0])
+
+		log.write(str(each[0][0].item())+",")
+		log.write(str(each[1][0].item())+"\n")
+
+	log.close()
 	indices = np.arange(len(actuals))
 
-	plt.bar(indices, actuals, color="b", label="Actuals")
-	plt.bar(indices, pred, color="r", label="Predicted")
-
+	plt.bar(indices, actuals, color="b", label="Actuals", )
+	plt.bar(indices, pred, color="r", label="Predicted", alpha=0.5)
+	axes = plt.gca()
+	axes.set_ylim([-2,10])
 	plt.legend()
 	plt.savefig("actualsvpredicted.png", format="png")
+	# plt.show()
 
 
 
