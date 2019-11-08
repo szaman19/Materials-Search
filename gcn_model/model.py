@@ -70,7 +70,7 @@ def main():
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
-	epoch = 50
+	epoch = 200
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
