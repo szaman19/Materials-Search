@@ -55,10 +55,12 @@ class Net(torch.nn.Module):
 
 		
 		x = F.relu(self.lin1(x))
-		x = F.dropout(x, p=1, training = self.training)
+		x = F.dropout(x, p=.7, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
 		return x
+
+
 
 def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -69,8 +71,8 @@ def main():
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
-	optimizer = torch.optim.Adam(model.parameters(), lr=1E-3)
-	epoch = 200
+	optimizer = torch.optim.Adam(model.parameters(), lr=1E-4)
+	epoch = 300
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
@@ -120,9 +122,9 @@ def main():
 
 	# print(vals)
 
-	log = open("vals.log",'w')
+	log = open("vals2.log",'w')
 	for each in vals:
-		print(each[0][0].item(), each[1][0].item())
+		# print(each[0][0].item(), each[1][0].item())
 		
 		actuals.append(each[1][0])
 		pred.append(each[0][0])
@@ -138,7 +140,7 @@ def main():
 	axes = plt.gca()
 	axes.set_ylim([-2,10])
 	plt.legend()
-	plt.savefig("actualsvpredicted.png", format="png")
+	plt.savefig("actualsvpredicted_p7.png", format="png")
 	# plt.show()
 
 
