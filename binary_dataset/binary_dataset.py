@@ -14,15 +14,6 @@ from pymatgen.io.cif import CifParser
 from torch_geometric.data import InMemoryDataset
 
 
-def download_file(url, file_name):
-    r = requests.get(url)
-
-    with open(file_name, 'wb') as f:
-        f.write(r.content)
-    if r.status_code == "200":
-        print("Completed download")
-
-
 class BinaryDataSet(InMemoryDataset):
 
     def __init__(self, train=True):
@@ -53,11 +44,11 @@ class BinaryDataSet(InMemoryDataset):
     def download(self):
         self.validate_caller()
         print('Downloading properties CSV...')
-        download_file(url='https://zenodo.org/record/3370144/files/2019-07-01-ASR-public_12020.csv?download=1',
-                      file_name=self.properties_file_path)
+        self.download_file(url='https://zenodo.org/record/3370144/files/2019-07-01-ASR-public_12020.csv?download=1',
+                           file_name=self.properties_file_path)
         print('Downloading CIF data...')
-        download_file(url='https://zenodo.org/record/3370144/files/2019-07-01-ASR-public_12020.tar?download=1',
-                      file_name=self.data_file_path)
+        self.download_file(url='https://zenodo.org/record/3370144/files/2019-07-01-ASR-public_12020.tar?download=1',
+                           file_name=self.data_file_path)
 
         print("Extracting tar...")
         with tarfile.open(self.data_file_path) as tar:
@@ -110,6 +101,15 @@ class BinaryDataSet(InMemoryDataset):
 
         data, slices = self.collate(data_list)
         torch.save((data, slices), self.processed_paths[0])
+
+    @staticmethod
+    def download_file(url, file_name):
+        r = requests.get(url)
+
+        with open(file_name, 'wb') as f:
+            f.write(r.content)
+        if r.status_code == "200":
+            print("Completed download")
 
     @staticmethod
     def cif_structure(file_name):
