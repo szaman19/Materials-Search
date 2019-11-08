@@ -72,7 +72,7 @@ def main():
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=1E-4)
-	epoch = 3000
+	epoch = 300
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
@@ -138,7 +138,7 @@ def main():
 	plt.bar(indices, actuals, color="b", label="Actuals", )
 	plt.bar(indices, pred, color="r", label="Predicted", alpha=0.5)
 	axes = plt.gca()
-	axes.set_ylim([-2,10])
+	axes.set_ylim([-2,14])
 	plt.legend()
 	plt.savefig("actualsvpredicted_p7.png", format="png")
 	# plt.show()
