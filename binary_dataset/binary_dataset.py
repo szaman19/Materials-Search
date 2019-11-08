@@ -21,11 +21,12 @@ class BinaryDataSet(InMemoryDataset):
         self.train = train
         self.properties_file = 'properties.csv'
         self.data_file = 'data.tar'
-        self.processed_data_file = 'data.pt'
+        self.processed_test_data = 'test_data.pt'
+        self.processed_training_data = 'training_data.pt'
         self.data_file_path = path.join(root, 'raw', self.data_file)
         self.properties_file_path = path.join(root, 'raw', self.properties_file)
         super(BinaryDataSet, self).__init__(root, transform=None, pre_transform=None)
-        self.data, self.slices = torch.load(self.processed_paths[0])
+        self.data, self.slices = torch.load(self.processed_training_data if train else self.processed_test_data)
 
     @property
     def raw_file_names(self):
@@ -33,7 +34,7 @@ class BinaryDataSet(InMemoryDataset):
 
     @property
     def processed_file_names(self):
-        return [self.processed_data_file]
+        return [self.processed_test_data, self.processed_training_data]
 
     @staticmethod
     def validate_caller():
@@ -80,27 +81,32 @@ class BinaryDataSet(InMemoryDataset):
         print("Creating binary PyTorch dataset...")
 
         labels = pd.read_csv(self.properties_file_path)
-        size = len(labels['filename'])
-        directory = path.join(self.raw_dir, ("training/" if self.train else "test/"))
+        for data_type in ['training', 'test']:
+            output_file = self.processed_training_data if data_type == 'training' else self.processed_test_data
+            directory = Path(path.join(self.raw_dir, data_type))
 
-        counter = 0
-        for file in Path(directory).iterdir():
-            structure = self.cif_structure(str(file))
-            distance_matrix = structure.distance_matrix
+            counter = 0
+            total_files = 0
+            for _ in directory.iterdir():
+                total_files += 1
 
-            graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
-            num_nodes = distance_matrix.shape[0]
+            for file in directory.iterdir():
+                structure = self.cif_structure(str(file))
+                distance_matrix = structure.distance_matrix
 
-            data = torch_geometric.utils.from_networkx(graph)
-            data.x = torch.ones(num_nodes, 1)
-            data.y = labels['LCD'][counter]
-            data_list.append(data)
+                graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+                num_nodes = distance_matrix.shape[0]
 
-            print("Elements loaded: ", counter, "/", size)
-            counter += 1
+                data = torch_geometric.utils.from_networkx(graph)
+                data.x = torch.ones(num_nodes, 1)
+                data.y = labels['LCD'][counter]
+                data_list.append(data)
 
-        data, slices = self.collate(data_list)
-        torch.save((data, slices), self.processed_paths[0])
+                print("Elements loaded: ", counter, "/", total_files)
+                counter += 1
+
+            data, slices = self.collate(data_list)
+            torch.save((data, slices), output_file)
 
     @staticmethod
     def download_file(url, file_name):
@@ -119,4 +125,4 @@ class BinaryDataSet(InMemoryDataset):
 
 
 if __name__ == '__main__':
-    BinaryDataSet().process()
+    BinaryDataSet()
