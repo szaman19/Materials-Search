@@ -75,7 +75,7 @@ def main():
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=1E-4)
-	epoch = 200
+	epoch = 20
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
@@ -125,7 +125,7 @@ def main():
 
 	# print(vals)
 
-	log = open("vals2.log",'w')
+	log = open("vals2_1.log",'w')
 	for each in vals:
 		# print(each[0][0].item(), each[1][0].item())
 		
@@ -141,9 +141,9 @@ def main():
 	plt.bar(indices, actuals, color="b", label="Actuals", )
 	plt.bar(indices, pred, color="r", label="Predicted", alpha=0.5)
 	axes = plt.gca()
-	axes.set_ylim([-2,14])
+	axes.set_ylim([0,16])
 	plt.legend()
-	plt.savefig("actualsvpredicted_p7.png", format="png")
+	plt.savefig("actualsvpredicted_p7_1.png", format="png")
 	# plt.show()
 
 

@@ -1,7 +1,7 @@
 from scipy import stats
 
 def main():
-	values = open("vals.log",'r')
+	values = open("vals2.log",'r')
 	actual = []
 	predicted = []
 
