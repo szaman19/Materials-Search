@@ -4,6 +4,7 @@ from torch_geometric.data import DataLoader
 from torch_geometric.nn import GraphConv, TopKPooling
 from torch_geometric.nn import global_mean_pool as gap
 from torch_geometric.nn import global_max_pool as gmp
+import pickle
 
 import matplotlib.pyplot as plt
 
@@ -65,14 +66,16 @@ class Net(torch.nn.Module):
 def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
+	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
+
+	training_data_list = pickle.load(open('pickled_data.p','rb'))
 	loader = DataLoader(training_data_list, batch_size = 1)
 
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=1E-4)
-	epoch = 300
+	epoch = 3
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
