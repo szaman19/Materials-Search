@@ -17,7 +17,7 @@ class Net(torch.nn.Module):
 		super(Net, self).__init__()
 		
 		#channel in is  size of input features, channel out is 128
-		self.conv1 = GraphConv(1, 128) 
+		self.conv1 = GraphConv(11, 128) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.8
 		self.pool1 = TopKPooling(128, ratio=0.8)
@@ -68,9 +68,11 @@ def main():
 
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	training_data_list = pickle.load(open('pickled_data.p','rb'))
+	training_data_list = pickle.load(open('one_hot_atom_train_data.p','rb'))
 	loader = DataLoader(training_data_list, batch_size = 1)
 
+	d(open('one_hot_atom_test_data.p','rb'))
+	test_loader = DataLoader
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
@@ -90,7 +92,23 @@ def main():
 			training_loss += loss.item()
 			loss.backward()
 			optimizer.step()
-		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader))
+		model.eval()
+
+		total_loss = 0
+
+		vals = []
+		for test_data in test_loader:
+			data = test_data.to(device)
+			with torch.no_grad():
+				pred= model(data)
+				vals.append((pred,torch.unsqueeze(test_data.y,1) ))
+				# print(pred)
+				# print(torch.unsqueeze(test_data.y,1))
+			loss = criterion(pred, torch.unsqueeze(test_data.y,1))
+			total_loss += loss.item()
+		print("MSE for test is: ", total_loss / len(test_loader))
+
+		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader), "Avg Test MSE: ", total_loss / len(test_loader))
 
 
 	print("*" * 40)
@@ -98,9 +116,9 @@ def main():
 	print("*" * 40)
 
 
-	test_dl = MOFDataset.MOFDataset(train=False).get_data()
+	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 
-	test_loader = DataLoader(test_dl, batch_size=1)
+	# test_loader = DataLoader(test_dl, batch_size=1)
 
 	model.eval()
 
@@ -143,7 +161,7 @@ def main():
 	axes = plt.gca()
 	axes.set_ylim([0,16])
 	plt.legend()
-	plt.savefig("actualsvpredicted_p7_1.png", format="png")
+	plt.savefig("atom_species_p7_1.png", format="png")
 	# plt.show()
 
 
