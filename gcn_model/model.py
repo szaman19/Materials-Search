@@ -71,8 +71,8 @@ def main():
 	training_data_list = pickle.load(open('one_hot_atom_train_data.p','rb'))
 	loader = DataLoader(training_data_list, batch_size = 1)
 
-	d(open('one_hot_atom_test_data.p','rb'))
-	test_loader = DataLoader
+	test_dl = pickle.load(open('pickled_test_data.p','rb'))
+	test_loader = DataLoader(test_dl, batch_size=1)
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()

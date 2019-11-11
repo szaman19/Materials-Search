@@ -1,9 +1,6 @@
 import torch 
 import torch.nn.functional as F
 from torch_geometric.data import DataLoader
-from torch_geometric.nn import GraphConv, TopKPooling
-from torch_geometric.nn import global_mean_pool as gap
-from torch_geometric.nn import global_max_pool as gmp
 import pickle
 
 import matplotlib.pyplot as plt
@@ -13,10 +10,8 @@ import MOFDataset
 
 import torch
 import torch.nn.functional as F
-from torch_geometric.datasets import TUDataset
 import torch_geometric.transforms as T
-from torch_geometric.data import DenseDataLoader
-from torch_geometric.nn import DenseSAGEConv, dense_diff_pool
+from torch_geometric.nn import SAGEConv, diff_pool
 
 max_nodes = 2000
 
@@ -123,8 +118,7 @@ def main():
 	epoch = 20
 	print("Starting Training:")
 	print("*"*40)
-	f
-	or i in range(epoch):
+	for i in range(epoch):
 
 		training_loss = 0
 		for data in loader:
