@@ -129,10 +129,7 @@ class MOFDataset():
 
 
 	def get_feature_matrix(self, structure, num_nodes):
-		if torch.cuda.is_available():
-			feature_matrix = torch.zeros(num_nodes,11, dtype=torch.half)
-		else:
-			feature_matrix = torch.zeros(num_nodes,11, dtype=torch.float)
+		feature_matrix = torch.zeros(num_nodes,11, dtype=torch.float)
 
 		counter = 0
 		for each in structure.sites:
