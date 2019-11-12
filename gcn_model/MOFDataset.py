@@ -9,6 +9,8 @@ import networkx as nx
 from multiprocessing import Pool
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
+torch.set_printoptions(profile="full")
+
 class MOFDataset():
 	"""docstring for MOFDataset"""
 	def __init__(self, 
@@ -82,12 +84,11 @@ class MOFDataset():
 				num_nodes = distance_matrix.shape[0]
 				
 				graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
-				num_nodes = distance_matrix.shape[0]
-					# print(num_nodes)
+
 				feature_matrix = self.get_feature_matrix(structure, num_nodes)
 					
 				data = torch_geometric.utils.from_networkx(graph)
-				data.x = torch.tensor(feature_matrix, dtype=torch.double)
+				data.x = feature_matrix
 				# data.x = torch.ones(num_nodes,1)
 					# data.x = feature_matrix
 				data.y = labels['LCD'][counter]
@@ -100,8 +101,8 @@ class MOFDataset():
 				counter +=1
 			else:
 				print("Not ok skipping: ", file)
-			# if(len(dataset) ==3):
-			# 	break
+			if(len(dataset) ==3):
+				break
 		return dataset
 
 	def cif_structure(self,file_name):
@@ -125,8 +126,14 @@ class MOFDataset():
 		true_val[val] = 1
 		print(true_val)
 		print(true_val == self.one_hot_encode(element))
+
+
 	def get_feature_matrix(self, structure, num_nodes):
-		feature_matrix = torch.zeros(num_nodes,11)
+		if torch.cuda.is_available():
+			feature_matrix = torch.zeros(num_nodes,11, dtype=torch.half)
+		else:
+			feature_matrix = torch.zeros(num_nodes,11, dtype=torch.float)
+
 		counter = 0
 		for each in structure.sites:
 			# vec = self.one_hot_encode(str(each.specie))
@@ -134,6 +141,7 @@ class MOFDataset():
 			index = self.one_hot_encode(str(each.specie))
 			feature_matrix[counter][index] = 1
 			counter +=1
+		# print(feature_matrix)
 		return feature_matrix
 
 	def get_data_helper(self, labels, counter):

@@ -12,11 +12,11 @@ import MOFDataset
 import pickle
 
 def main():
-	file = open("one_hot_atom_test_data.p", 'wb')
+	file = open("one_hot_atom_test_data_half_precision.p", 'wb')
 	training_data_list = MOFDataset.MOFDataset(train=False).get_data()
 	pickle.dump(training_data_list, file)
 
-	train_file = open("one_hot_atom_train_data.p", 'wb')
+	train_file = open("one_hot_atom_train_data_half_precision.p", 'wb')
 	dl = MOFDataset.MOFDataset(train=True).get_data()
 	pickle.dump(dl, train_file)
 

@@ -66,12 +66,17 @@ class Net(torch.nn.Module):
 def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
+	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	training_data_list = pickle.load(open('one_hot_atom_train_data.p','rb'))
+	# training_data_list = pickle.load(open('one_hot_atom_train_data.p','rb'))
 	loader = DataLoader(training_data_list, batch_size = 1)
 
-	test_dl = pickle.load(open('pickled_test_data.p','rb'))
+
+	test_dl = MOFDataset.MOFDataset(train=False).get_data()
+
+
+
+	# test_dl = pickle.load(open('pickled_test_data.p','rb'))
 	test_loader = DataLoader(test_dl, batch_size=1)
 
 	model = Net(11).to(device)
