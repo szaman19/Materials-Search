@@ -68,7 +68,7 @@ def main():
 
 	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	 training_data_list = pickle.load(open('one_hot_atom_train_data_half_precision.p','rb'))
+	training_data_list = pickle.load(open('one_hot_atom_train_data_half_precision.p','rb'))
 	#loader = DataLoader(training_data_list, batch_size = 1)
 
 
