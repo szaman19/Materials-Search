@@ -19,8 +19,8 @@ class Net(torch.nn.Module):
 		#channel in is  size of input features, channel out is 128
 		self.conv1 = GraphConv(11, 128) 
 
-		#channel in is 128, channel out is 128. Ratio is 0.8
-		self.pool1 = TopKPooling(128, ratio=0.8)
+		#channel in is 128, channel out is 128. Ratio is 0.5
+		self.pool1 = TopKPooling(128, ratio=0.5)
 		
 		#channel in is 128. channel out is 128
 		self.conv2 = GraphConv(128,128)
@@ -32,8 +32,8 @@ class Net(torch.nn.Module):
 
 		self.pool3 = TopKPooling(128, ratio=0.8)
 
-		self.lin1 = torch.nn.Linear(256, 128)
-		self.lin2 = torch.nn.Linear(128,64)
+		self.lin1 = torch.nn.Linear(256, 512)
+		self.lin2 = torch.nn.Linear(512,64)
 		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
 
 	def forward(self, data):
@@ -56,7 +56,7 @@ class Net(torch.nn.Module):
 
 		
 		x = F.relu(self.lin1(x))
-		x = F.dropout(x, p=.8, training = self.training)
+		x = F.dropout(x, p=.7, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
 		return x
@@ -69,7 +69,7 @@ def main():
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
 	training_data_list = pickle.load(open('sparse_train_data_half_precision_sp.p','rb'))
-	loader = DataLoader(training_data_list, batch_size = 4)
+	loader = DataLoader(training_data_list, batch_size = 2)
 
 
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
@@ -81,12 +81,12 @@ def main():
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
-	optimizer = torch.optim.Adam(model.parameters(), lr=1E-4)
+	optimizer = torch.optim.Adam(model.parameters(), lr=5E-4)
 	epoch = 100
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
-
+		model.train()
 		training_loss = 0
 		for data in loader:
 			data = data.to(device)
@@ -149,7 +149,7 @@ def main():
 
 	# print(vals)
 
-	log = open("vals2_1.log",'w')
+	log = open("vals2_2.log",'w')
 	for each in vals:
 		# print(each[0][0].item(), each[1][0].item())
 		
@@ -167,12 +167,15 @@ def main():
 	axes = plt.gca()
 	axes.set_ylim([0,16])
 	plt.legend()
-	plt.savefig("atom_species_p7_1_SPARSE.png", format="png")
+	plt.savefig("atom_species_p7_2_SPARSE.png", format="png")
 	# plt.show()
 
 
 
-
+def print_mode():
+	model = Net(11)
+	print(model)
 	
 if __name__ == '__main__':
 	main()
+	# print_mode()
