@@ -82,7 +82,7 @@ def main():
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
-	epoch = 20
+	epoch = 40
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
@@ -97,6 +97,7 @@ def main():
 			training_loss += loss.item()
 			loss.backward()
 			optimizer.step()
+		
 		model.eval()
 
 		total_loss = 0
@@ -111,7 +112,7 @@ def main():
 				# print(torch.unsqueeze(test_data.y,1))
 			loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 			total_loss += loss.item()
-		print("MSE for test is: ", total_loss / len(test_loader))
+		# print("MSE for test is: ", total_loss / len(test_loader))
 
 		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader), "Avg Test MSE: ", total_loss / len(test_loader))
 
