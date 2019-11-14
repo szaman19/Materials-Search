@@ -85,22 +85,21 @@ class MOFDataset():
 
 				num_nodes = distance_matrix.shape[0]
 
-				if (num_nodes < 50):
 				
-					distance_matrix = (distance_matrix < 2.5) * distance_matrix
-					
-					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+				distance_matrix = (distance_matrix < 2.5) * distance_matrix
 
-					feature_matrix = self.get_feature_matrix(structure, num_nodes)
+				graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+
+				feature_matrix = self.get_feature_matrix(structure, num_nodes)
 						
-					data = torch_geometric.utils.from_networkx(graph)
-					data.x = feature_matrix
+				data = torch_geometric.utils.from_networkx(graph)
+				data.x = feature_matrix
 					# data.x = torch.ones(num_nodes,1)
 						# data.x = feature_matrix
-					data.y = labels['LCD'][counter]
+				data.y = labels['LCD'][counter]
 					# print(file, num_nodes, labels['LCD'][counter])
 						
-					dataset.append(data)
+				dataset.append(data)
 				
 				print("Elements loaded: ",counter, "/", size)
 

@@ -166,7 +166,7 @@ def main():
 	axes = plt.gca()
 	axes.set_ylim([0,16])
 	plt.legend()
-	plt.savefig("atom_species_p7_1.png", format="png")
+	plt.savefig("atom_species_p7_1_SPARSE.png", format="png")
 	# plt.show()
 
 
