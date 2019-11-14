@@ -66,9 +66,9 @@ class Net(torch.nn.Module):
 def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-	training_data_list = MOFDataset.MOFDataset(train=True).get_data()
+	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	# training_data_list = pickle.load(open('one_hot_atom_train_data_half_precision.p','rb'))
+	training_data_list = pickle.load(open('sparse_train_data_half_precision_sp.p','rb'))
 	loader = DataLoader(training_data_list, batch_size = 4)
 
 
@@ -76,13 +76,13 @@ def main():
 
 
 
-	# test_dl = pickle.load(open('one_hot_atom_test_data_half_precision.p','rb'))
+	test_dl = pickle.load(open('sparse_test_data_half_precision.p','rb'))
 	test_loader = DataLoader(test_dl, batch_size=1)
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
-	epoch = 1000
+	epoch = 100
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
