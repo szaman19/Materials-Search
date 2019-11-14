@@ -72,7 +72,7 @@ def main():
 	loader = DataLoader(training_data_list, batch_size = 4)
 
 
-	test_dl = MOFDataset.MOFDataset(train=False).get_data()
+	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 
 
 
