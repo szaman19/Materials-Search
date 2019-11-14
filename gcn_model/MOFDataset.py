@@ -77,24 +77,30 @@ class MOFDataset():
 		# print(dataset)
 		for file in labels['filename']:
 			if(os.path.exists(directory+file+".cif")):
+
+
 				file  = labels['filename'][counter]
 				structure = self.cif_structure(directory+file+".cif")
 				distance_matrix = structure.distance_matrix
 
 				num_nodes = distance_matrix.shape[0]
-				
-				graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
 
-				feature_matrix = self.get_feature_matrix(structure, num_nodes)
+				if (num_nodes < 50):
+				
+					distance_matrix = (distance_matrix < 2.5) * distance_matrix
 					
-				data = torch_geometric.utils.from_networkx(graph)
-				data.x = feature_matrix
-				# data.x = torch.ones(num_nodes,1)
-					# data.x = feature_matrix
-				data.y = labels['LCD'][counter]
-				# print(file, num_nodes, labels['LCD'][counter])
-					
-				dataset.append(data)
+					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+
+					feature_matrix = self.get_feature_matrix(structure, num_nodes)
+						
+					data = torch_geometric.utils.from_networkx(graph)
+					data.x = feature_matrix
+					# data.x = torch.ones(num_nodes,1)
+						# data.x = feature_matrix
+					data.y = labels['LCD'][counter]
+					# print(file, num_nodes, labels['LCD'][counter])
+						
+					dataset.append(data)
 				
 				print("Elements loaded: ",counter, "/", size)
 
