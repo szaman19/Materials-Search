@@ -107,8 +107,8 @@ class MOFDataset():
 				counter +=1
 			else:
 				print("Not ok skipping: ", file)
-			#if(len(dataset) ==3):
-				#break
+			if(len(dataset) ==3):
+				break
 		return dataset
 
 	def cif_structure(self,file_name):
