@@ -56,7 +56,7 @@ class Net(torch.nn.Module):
 
 		
 		x = F.relu(self.lin1(x))
-		x = F.dropout(x, p=.7, training = self.training)
+		x = F.dropout(x, p=.8, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
 		return x
@@ -81,8 +81,8 @@ def main():
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
-	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
-	epoch = 40
+	optimizer = torch.optim.Adam(model.parameters(), lr=1E-4)
+	epoch = 100
 	print("Starting Training:")
 	print("*"*40)
 	for i in range(epoch):
