@@ -36,7 +36,9 @@ class Net(torch.nn.Module):
 
 		self.pool4 = TopKPooling(128, ratio=0.8)
 
+
 		self.lin1 = torch.nn.Linear(256, 128)
+		self.bn1 = torch.nn.BatchNorm1d(num_features=128)
 		self.lin2 = torch.nn.Linear(128,64)
 		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
 
@@ -63,8 +65,7 @@ class Net(torch.nn.Module):
 		x = x1 + x2 + x3 + x4
 
 		
-		x = F.relu(self.lin1(x))
-		
+		x = F.relu(self.bn1(self.lin1(x)))
 		# x = F.dropout(x, p=.001, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
