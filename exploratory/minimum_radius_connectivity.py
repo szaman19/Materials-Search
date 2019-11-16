@@ -1,6 +1,7 @@
 import pymatgen
 import sys
 from pymatgen.io.cif import CifParser
+from multiprocessing import Pool
 import os
 import math
 import glob
@@ -53,9 +54,9 @@ def func(files):
 
 	return_val = []
 	for f in files:
-		struct = Periodic_Struture(file)
+		struct = Periodic_Struture(f)
 		struct.get_min_radius()
-		return_val.append(f, struct.r)
+		return_val.append(str((f, str(struct.r))))
 	return return_val
 
 
@@ -79,7 +80,7 @@ def main():
 	results = [pool.apply_async(func, args=(file_chunks[i],)) for i in range(Num_Processes)]
 	output = [p.get() for p in results]
 
-	log = open("min_radius.log","w")
+	log = open("min_radius_2.log","w")
 
 	for returned_list in output:
 		for each in returned_list:
