@@ -65,7 +65,7 @@ class Net(torch.nn.Module):
 		x = x1 + x2 + x3 + x4
 
 		
-		x = F.relu(self.bn1(self.lin1(x)))
+		x = F.relu(self.lin1(x))
 		# x = F.dropout(x, p=.001, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
