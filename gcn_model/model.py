@@ -53,7 +53,7 @@ class Net(torch.nn.Module):
 		x2 = torch.cat([gmp(x,batch), gap(x,batch)], dim=1)
 
 		x = F.relu(self.conv3(x, edge_index, weight))
-		x, edge_index, _, batch, _, _ = self.pool3(x, edge_index,weight , batch)
+		x, edge_index, weight, batch, _, _ = self.pool3(x, edge_index,weight , batch)
 		x3 = torch.cat([gmp(x,batch), gap(x,batch)], dim=1)
 
 		x = F.relu(self.conv3(x, edge_index, weight))
@@ -90,7 +90,7 @@ def main():
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
-	epoch = 100
+	epoch = 200
 	print("Starting Training:")
 	print("*"*40)
 	model.train()
