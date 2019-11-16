@@ -30,11 +30,11 @@ class Net(torch.nn.Module):
 
 		self.conv3 = GraphConv(128, 128)
 
+		self.pool3 = TopKPooling(128, ratio=0.8)
 		
-		self.pool4 = TopKPooling(128, ratio=0.8)
-
 		self.conv4 = GraphConv(128, 128)
 
+		self.pool4 = TopKPooling(128, ratio=0.8)
 
 		self.lin1 = torch.nn.Linear(256, 128)
 		self.lin2 = torch.nn.Linear(128,64)
