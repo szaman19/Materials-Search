@@ -86,7 +86,7 @@ def main():
 	# 	print(data.y)
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 	test_dl = pickle.load(open('sparse_test_data_half_precision.p','rb'))
-	test_loader = DataLoader(test_dl, batch_size=16)
+	test_loader = DataLoader(test_dl, batch_size=1)
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
