@@ -20,7 +20,7 @@ class Net(torch.nn.Module):
 		self.conv1 = GraphConv(11, 128) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.5
-		self.pool1 = TopKPooling(128, ratio=0.8)
+		self.pool1 = TopKPooling(128, ratio=0.5)
 		
 		#channel in is 128. channel out is 128
 		self.conv2 = GraphConv(128,128)
@@ -30,7 +30,11 @@ class Net(torch.nn.Module):
 
 		self.conv3 = GraphConv(128, 128)
 
-		self.pool3 = TopKPooling(128, ratio=0.8)
+		
+		self.pool4 = TopKPooling(128, ratio=0.8)
+
+		self.conv4 = GraphConv(128, 128)
+
 
 		self.lin1 = torch.nn.Linear(256, 128)
 		self.lin2 = torch.nn.Linear(128,64)
@@ -52,7 +56,11 @@ class Net(torch.nn.Module):
 		x, edge_index, _, batch, _, _ = self.pool3(x, edge_index,weight , batch)
 		x3 = torch.cat([gmp(x,batch), gap(x,batch)], dim=1)
 
-		x = x1 + x2 + x3 
+		x = F.relu(self.conv3(x, edge_index, weight))
+		x, edge_index, _, batch, _, _ = self.pool4(x, edge_index,weight , batch)
+		x4 = torch.cat([gmp(x,batch), gap(x,batch)], dim=1)
+
+		x = x1 + x2 + x3 + x4
 
 		
 		x = F.relu(self.lin1(x))
@@ -119,7 +127,7 @@ def main():
 				# print(torch.unsqueeze(test_data.y,1))
 			loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 			total_loss += loss.item()
-		print("MSE for test is: ", total_loss / len(test_loader))
+		# print("MSE for test is: ", total_loss / len(test_loader))
 
 		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader), " Test MSE: ", total_loss / len(test_loader))
 
