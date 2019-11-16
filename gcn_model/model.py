@@ -108,8 +108,8 @@ def main():
 			loss = criterion(out, torch.unsqueeze(data.y,1))
 			# print(loss.item())
 			training_loss += loss.item()
-			count +=1
-			print(training_loss)
+			#count +=1
+			#print(training_loss)
 			loss.backward()
 			optimizer.step()
 		
@@ -123,7 +123,7 @@ def main():
 				pred= model(data)
 			loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 			total_loss += loss.item()
-			test_count +=1
+			#test_count +=1
 		# print("MSE for test is: ", total_loss / len(test_loader))
 
 		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader), " Test MSE: ", total_loss / len(test_loader))
@@ -150,7 +150,7 @@ def main():
 			pred= model(data)
 			vals.append((pred,torch.unsqueeze(test_data.y,1) ))
 			# print(pred)
-			# print(torch.unsqueeze(test_data.y,1))
+			print(pred, torch.unsqueeze(test_data.y,1))
 		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 		total_loss += loss.item()
 	print("MSE for test is: ", total_loss / len(loader))
