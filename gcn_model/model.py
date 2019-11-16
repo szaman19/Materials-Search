@@ -100,6 +100,7 @@ def main():
 		# optimizer.zero_grad()
 
 		training_loss = 0
+		count = 0
 		for data in loader:
 			data = data.to(device)
 			optimizer.zero_grad()
@@ -107,18 +108,17 @@ def main():
 			loss = criterion(out, torch.unsqueeze(data.y,1))
 			# print(loss.item())
 			training_loss += loss.item()
+			count +=1
+			print(training_loss)
 			loss.backward()
 			optimizer.step()
-
-		# optimizer.step()
-		# optimizer.zero_grad()
-
 		
 		model.eval()
 
 		total_loss = 0
 
 		vals = []
+		test_count = 0
 		for test_data in test_loader:
 			data = test_data.to(device)
 			with torch.no_grad():
@@ -128,9 +128,10 @@ def main():
 				# print(torch.unsqueeze(test_data.y,1))
 			loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 			total_loss += loss.item()
+			test_count +=1
 		# print("MSE for test is: ", total_loss / len(test_loader))
 
-		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader), " Test MSE: ", total_loss / len(test_loader))
+		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / count, " Test MSE: ", total_loss / test_count)
 
 
 	print("*" * 40)
