@@ -32,8 +32,8 @@ class Net(torch.nn.Module):
 
 		self.pool3 = TopKPooling(128, ratio=0.8)
 
-		self.lin1 = torch.nn.Linear(256, 512)
-		self.lin2 = torch.nn.Linear(512,64)
+		self.lin1 = torch.nn.Linear(256, 128)
+		self.lin2 = torch.nn.Linear(128,64)
 		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
 
 	def forward(self, data):
@@ -58,7 +58,7 @@ class Net(torch.nn.Module):
 		x = F.relu(self.lin1(x))
 		x = F.dropout(x, p=.75, training = self.training)
 		x = F.relu(self.lin2(x))
-		x = F.dropout(x, p=.9, training = self.training)
+		# x = F.dropout(x, p=.9, training = self.training)
 		x = self.lin3(x)
 		return x
 
@@ -71,12 +71,7 @@ def main():
 
 	training_data_list = pickle.load(open('sparse_train_data_half_precision_sp.p','rb'))
 	loader = DataLoader(training_data_list, batch_size = 2)
-
-
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
-
-
-
 	test_dl = pickle.load(open('sparse_test_data_half_precision.p','rb'))
 	test_loader = DataLoader(test_dl, batch_size=1)
 
@@ -88,16 +83,19 @@ def main():
 	print("*"*40)
 	for i in range(epoch):
 		model.train()
+		optimizer.zero_grad()
+
 		training_loss = 0
 		for data in loader:
 			data = data.to(device)
-			optimizer.zero_grad()
+			# optimizer.zero_grad()
 			out = model(data)
 			loss = criterion(out, torch.unsqueeze(data.y,1))
 			# print(loss.item())
 			training_loss += loss.item()
-			loss.backward()
-			optimizer.step()
+		
+		loss.backward()
+		optimizer.step()
 		
 		model.eval()
 
@@ -150,7 +148,7 @@ def main():
 
 	# print(vals)
 
-	log = open("vals2_2.log",'w')
+	log = open("vals2_3.log",'w')
 	for each in vals:
 		# print(each[0][0].item(), each[1][0].item())
 		
@@ -168,7 +166,7 @@ def main():
 	axes = plt.gca()
 	axes.set_ylim([0,16])
 	plt.legend()
-	plt.savefig("atom_species_p7_2_SPARSE.png", format="png")
+	plt.savefig("atom_species_p7_3_SPARSE.png", format="png")
 	# plt.show()
 
 
