@@ -93,8 +93,7 @@ def main():
 			loss = criterion(out, torch.unsqueeze(data.y,1))
 			# print(loss.item())
 			training_loss += loss.item()
-		
-		loss.backward()
+			loss.backward()
 		optimizer.step()
 		
 		model.eval()
@@ -148,7 +147,7 @@ def main():
 
 	# print(vals)
 
-	log = open("vals2_3.log",'w')
+	log = open("vals2_2.log",'w')
 	for each in vals:
 		# print(each[0][0].item(), each[1][0].item())
 		
