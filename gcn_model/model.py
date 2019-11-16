@@ -75,7 +75,7 @@ def main():
 	# for data in loader:
 	# 	print(data)
 	# 	print(data.y)
-	test_dl = MOFDataset.MOFDataset(train=False).get_data()
+	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 	test_dl = pickle.load(open('sparse_test_data_half_precision.p','rb'))
 	# test_loader = DataLoader(test_dl, batch_size=1)
 
