@@ -133,57 +133,57 @@ def main():
 		print("Epoch: ", i + 1, " Average Training MSE: ", training_loss / len(loader), " Test MSE: ", total_loss / len(test_loader))
 
 
-	# print("*" * 40)
-	# print("Starting Test: ")
-	# print("*" * 40)
+	print("*" * 40)
+	print("Starting Test: ")
+	print("*" * 40)
 
 
 	# # test_dl = MOFDataset.MOFDataset(train=False).get_data()
 
 	# # test_loader = DataLoader(test_dl, batch_size=1)
 
-	# model.eval()
+	model.eval()
 
-	# total_loss = 0
+	total_loss = 0
 
-	# vals = []
-	# for test_data in test_loader:
-	# 	data = test_data.to(device)
-	# 	with torch.no_grad():
-	# 		pred= model(data)
-	# 		vals.append((pred,torch.unsqueeze(test_data.y,1) ))
-	# 		# print(pred)
-	# 		# print(torch.unsqueeze(test_data.y,1))
-	# 	loss = criterion(pred, torch.unsqueeze(test_data.y,1))
-	# 	total_loss += loss.item()
-	# print("MSE for test is: ", total_loss / len(test_loader))
+	vals = []
+	for test_data in test_loader:
+		data = test_data.to(device)
+		with torch.no_grad():
+			pred= model(data)
+			vals.append((pred,torch.unsqueeze(test_data.y,1) ))
+			# print(pred)
+			# print(torch.unsqueeze(test_data.y,1))
+		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
+		total_loss += loss.item()
+	print("MSE for test is: ", total_loss / len(test_loader))
 
-	# vals.sort(key=lambda tup:tup[1])
+	vals.sort(key=lambda tup:tup[1])
 
-	# actuals = []
-	# pred = []
+	actuals = []
+	pred = []
 
-	# # print(vals)
+	# print(vals)
 
-	# log = open("vals2_2.log",'w')
-	# for each in vals:
-	# 	# print(each[0][0].item(), each[1][0].item())
+	log = open("vals2_2.log",'w')
+	for each in vals:
+		# print(each[0][0].item(), each[1][0].item())
 		
-	# 	actuals.append(each[1][0])
-	# 	pred.append(each[0][0])
+		actuals.append(each[1][0])
+		pred.append(each[0][0])
 
-	# 	log.write(str(each[0][0].item())+",")
-	# 	log.write(str(each[1][0].item())+"\n")
+		log.write(str(each[0][0].item())+",")
+		log.write(str(each[1][0].item())+"\n")
 
-	# log.close()
-	# indices = np.arange(len(actuals))
+	log.close()
+	indices = np.arange(len(actuals))
 
-	# plt.bar(indices, actuals, color="b", label="Actuals", )
-	# plt.bar(indices, pred, color="r", label="Predicted", alpha=0.5)
-	# axes = plt.gca()
-	# axes.set_ylim([0,16])
-	# plt.legend()
-	# plt.savefig("atom_species_p7_3_SPARSE.png", format="png")
+	plt.bar(indices, actuals, color="b", label="Actuals", )
+	plt.bar(indices, pred, color="r", label="Predicted", alpha=0.5)
+	axes = plt.gca()
+	axes.set_ylim([0,16])
+	plt.legend()
+	plt.savefig("atom_species_p1_2_SPARSE.png", format="png")
 	# # plt.show()
 
 
