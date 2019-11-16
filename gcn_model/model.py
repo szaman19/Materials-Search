@@ -70,7 +70,7 @@ def main():
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
 	training_data_list = pickle.load(open('sparse_train_data_half_precision_sp.p','rb'))
-	loader = DataLoader(training_data_list, batch_size = 2)
+	loader = DataLoader(training_data_list, batch_size = 8)
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 	test_dl = pickle.load(open('sparse_test_data_half_precision.p','rb'))
 	test_loader = DataLoader(test_dl, batch_size=1)
