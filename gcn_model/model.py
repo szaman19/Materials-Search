@@ -86,7 +86,7 @@ def main():
 	# 	print(data.y)
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 	test_dl = pickle.load(open('sparse_test_data_half_precision.p','rb'))
-	test_loader = DataLoader(test_dl, batch_size=1)
+	test_loader = DataLoader(test_dl, batch_size=128)
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
@@ -147,7 +147,8 @@ def main():
 	total_loss = 0
 
 	vals = []
-	for test_data in test_loader:
+	loader = DataLoader(training_data_list, batch_size=1)
+	for test_data in loader:
 		data = test_data.to(device)
 		with torch.no_grad():
 			pred= model(data)
@@ -156,7 +157,7 @@ def main():
 			# print(torch.unsqueeze(test_data.y,1))
 		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 		total_loss += loss.item()
-	print("MSE for test is: ", total_loss / len(test_loader))
+	print("MSE for test is: ", total_loss / len(loader))
 
 	vals.sort(key=lambda tup:tup[1])
 
