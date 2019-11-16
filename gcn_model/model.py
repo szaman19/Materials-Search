@@ -70,19 +70,19 @@ def main():
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
 	training_data_list = pickle.load(open('sparse_train_data_half_precision_sp.p','rb'))
-	loader = DataLoader(training_data_list, batch_size = 16)
+	loader = DataLoader(training_data_list, batch_size = 32)
 
 	# for data in loader:
 	# 	print(data)
 	# 	print(data.y)
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 	test_dl = pickle.load(open('sparse_test_data_half_precision.p','rb'))
-	# test_loader = DataLoader(test_dl, batch_size=1)
+	test_loader = DataLoader(test_dl, batch_size=16)
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
-	epoch = 1000
+	epoch = 100
 	print("Starting Training:")
 	print("*"*40)
 	model.train()
