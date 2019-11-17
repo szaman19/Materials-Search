@@ -79,14 +79,14 @@ def main():
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
 	training_data_list = pickle.load(open('sparse_train_data_half_precision_sp.p','rb'))
-	loader = DataLoader(training_data_list, batch_size = 32)
+	loader = DataLoader(training_data_list, batch_size = 64)
 
 	# for data in loader:
 	# 	print(data)
 	# 	print(data.y)
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 	test_dl = pickle.load(open('sparse_test_data_half_precision.p','rb'))
-	test_loader = DataLoader(test_dl, batch_size=128)
+	test_loader = DataLoader(test_dl, batch_size=256)
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
@@ -150,7 +150,7 @@ def main():
 			pred= model(data)
 			vals.append((pred,torch.unsqueeze(test_data.y,1) ))
 			# print(pred)
-			print(pred, torch.unsqueeze(test_data.y,1))
+			# print(pred, torch.unsqueeze(test_data.y,1))
 		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 		total_loss += loss.item()
 	print("MSE for test is: ", total_loss / len(loader))
