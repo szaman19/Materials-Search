@@ -81,14 +81,14 @@ def main():
 
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	training_data_list = pickle.load(open('inverse_sparse_train_data_half_precision_sp.p','rb'))
+	training_data_list = pickle.load(open('inverse_sparse_train_data_PLD.p','rb'))
 	loader = DataLoader(training_data_list, batch_size = 32)
 
 	# for data in loader:
 	# 	print(data)
 	# 	print(data.y)
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
-	test_dl = pickle.load(open('inverse_sparse_test_data_half_precision.p','rb'))
+	test_dl = pickle.load(open('inverse_sparse_test_data_PLD.p','rb'))
 	test_loader = DataLoader(test_dl, batch_size=256)
 
 	model = Net(11).to(device)
