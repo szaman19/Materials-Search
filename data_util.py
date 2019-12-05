@@ -16,7 +16,7 @@ def main():
 	for cif_file in file_names:
 		cif_file = cif_file.rstrip()
 		num = random.random()
-		if(num < .79):
+		if(num < .89):
 			os.rename(source_dir+cif_file, train_dir+cif_file)
 		else:
 			os.rename(source_dir+cif_file, test_dir+cif_file)
