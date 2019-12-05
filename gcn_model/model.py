@@ -37,9 +37,9 @@ class Net(torch.nn.Module):
 		self.pool4 = TopKPooling(128, ratio=0.8)
 
 
-		self.lin1 = torch.nn.Linear(256, 128)
+		self.lin1 = torch.nn.Linear(1024, 256)
 		self.bn1 = torch.nn.BatchNorm1d(num_features=128)
-		self.lin2 = torch.nn.Linear(128,64)
+		self.lin2 = torch.nn.Linear(256,64)
 		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
 
 	def forward(self, data):
@@ -62,11 +62,11 @@ class Net(torch.nn.Module):
 		x, edge_index, _, batch, _, _ = self.pool4(x, edge_index,weight , batch)
 		x4 = torch.cat([gmp(x,batch), gap(x,batch)], dim=1)
 
-		x = x1 + x2 + x3 + x4
+		x = torch.cat([x1, x2, x3, x4], dim=1)
 
 		
 		x = F.relu(self.lin1(x))
-		# x = F.dropout(x, p=.001, training = self.training)
+		x = F.dropout(x, p=.1, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
 		return x
