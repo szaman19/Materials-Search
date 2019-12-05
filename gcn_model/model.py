@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch_geometric.data import DataLoader
 from torch_geometric.nn import TopKPooling
-from torch_geometric.nn import GCNConv as GraphConv
+from torch_geometric.nn import GraphConv as GraphConv
 from torch_geometric.nn import global_mean_pool as gap
 from torch_geometric.nn import global_max_pool as gmp
 import pickle
@@ -81,15 +81,15 @@ def main():
 
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	training_data_list = pickle.load(open('inverse_sparse_train_data_PLD.p','rb'))
-	loader = DataLoader(training_data_list, batch_size = 32)
+	training_data_list = pickle.load(open('inverse_dense_train_data_PLD.p','rb'))
+	loader = DataLoader(training_data_list, batch_size = 4)
 
 	# for data in loader:
 	# 	print(data)
 	# 	print(data.y)
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
-	test_dl = pickle.load(open('inverse_sparse_test_data_PLD.p','rb'))
-	test_loader = DataLoader(test_dl, batch_size=256)
+	test_dl = pickle.load(open('inverse_dense_test_data_PLD.p','rb'))
+	test_loader = DataLoader(test_dl, batch_size=4)
 
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
