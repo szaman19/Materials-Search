@@ -86,8 +86,8 @@ class MOFDataset():
 				if (num_nodes < 2000):
 
 				
-					distance_matrix = (distance_matrix < 2.5) * distance_matrix
 					distance_matrix = 1 / distance_matrix
+					distance_matrix = (distance_matrix > .4) * distance_matrix
 					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
 
 					feature_matrix = self.get_feature_matrix(structure, num_nodes)
@@ -106,8 +106,6 @@ class MOFDataset():
 				counter +=1
 			else:
 				print("Not ok skipping: ", file)
-			if(len(dataset) ==3):
-				break
 		return dataset
 
 	def cif_structure(self,file_name):
