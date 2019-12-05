@@ -83,7 +83,7 @@ class MOFDataset():
 				distance_matrix = structure.distance_matrix
 
 				num_nodes = distance_matrix.shape[0]
-				if (num_nodes < 50):
+				if (num_nodes < 2000):
 
 				
 					distance_matrix = (distance_matrix < 2.5) * distance_matrix
