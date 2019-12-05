@@ -39,7 +39,7 @@ class Net(torch.nn.Module):
 
 
 		self.lin1 = torch.nn.Linear(1024, 256)
-		self.bn1 = torch.nn.BatchNorm1d(num_features=128)
+		self.bn1 = torch.nn.BatchNorm1d(num_features=256)
 		self.lin2 = torch.nn.Linear(256,64)
 		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
 
@@ -66,7 +66,7 @@ class Net(torch.nn.Module):
 		x = torch.cat([x1, x2, x3, x4], dim=1)
 
 		
-		x = F.relu(self.lin1(x))
+		x = self.bn1(F.relu(self.lin1(x)))
 		x = F.dropout(x, p=.1, training = self.training)
 		x = F.relu(self.lin2(x))
 		x = self.lin3(x)
