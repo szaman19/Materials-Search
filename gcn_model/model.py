@@ -67,9 +67,9 @@ class Net(torch.nn.Module):
 		x = torch.cat([x1, x2, x3, x4], dim=1)
 
 		
-		x = self.bn1(F.relu(self.lin1(x)))
+		x = F.relu(self.lin1(x))
 		x = F.dropout(x, p=.2, training = self.training)
-		x = self.bn2(F.relu(self.lin2(x)))
+		x = F.relu(self.lin2(x))
 		x = F.dropout(x, p=.5, training = self.training)
 		x = self.lin3(x)
 		return x
