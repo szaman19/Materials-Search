@@ -85,7 +85,7 @@ class MOFDataset():
 				num_nodes = distance_matrix.shape[0]
 				if (num_nodes < 2000):
 
-				
+					distance_matrix = ((distance_matrix == 0)*1000) + distance_matrix 
 					distance_matrix = 1 / distance_matrix
 					distance_matrix = (distance_matrix > .4) * distance_matrix
 					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
