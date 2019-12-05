@@ -68,9 +68,9 @@ class Net(torch.nn.Module):
 
 		
 		x = self.bn1(F.relu(self.lin1(x)))
-		x = F.dropout(x, p=.1, training = self.training)
+		x = F.dropout(x, p=.5, training = self.training)
 		x = self.bn2(F.relu(self.lin2(x)))
-		x = F.dropout(x, p=.1, training = self.training)
+		x = F.dropout(x, p=.5, training = self.training)
 		x = self.lin3(x)
 		return x
 
@@ -94,7 +94,7 @@ def main():
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
-	epoch = 100
+	epoch = 50
 	print("Starting Training:")
 	print("*"*40)
 	model.train()
@@ -182,7 +182,7 @@ def main():
 	axes = plt.gca()
 	axes.set_ylim([0,16])
 	plt.legend()
-	plt.savefig("atom_species_p1_1_SPARSE_INVERSE.png", format="png")
+	plt.savefig("atom_species_pld.png", format="png")
 	# # plt.show()
 
 
