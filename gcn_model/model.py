@@ -21,7 +21,7 @@ class Net(torch.nn.Module):
 		self.conv1 = GraphConv(11, 128) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.5
-		self.pool1 = TopKPooling(128, ratio=0.8)
+		self.pool1 = TopKPooling(128, ratio=0.5)
 		
 		#channel in is 128. channel out is 128
 		self.conv2 = GraphConv(128,128)
@@ -68,7 +68,7 @@ class Net(torch.nn.Module):
 
 		
 		x = self.bn1(F.relu(self.lin1(x)))
-		x = F.dropout(x, p=.5, training = self.training)
+		x = F.dropout(x, p=.2, training = self.training)
 		x = self.bn2(F.relu(self.lin2(x)))
 		x = F.dropout(x, p=.5, training = self.training)
 		x = self.lin3(x)
@@ -145,17 +145,17 @@ def main():
 	total_loss = 0
 
 	vals = []
-	# loader = DataLoader(training_data_list, batch_size=1)
+	test_loader = DataLoader(test_dl, batch_size=1)
 	for test_data in test_loader:
 		data = test_data.to(device)
 		with torch.no_grad():
 			pred= model(data)
-			vals.append((pred,torch.unsqueeze(test_data.y,1) ))
+			vals.append((pred,torch.unsqueeze(test_data.y,1)))
 			# print(pred)
 			# print(pred, torch.unsqueeze(test_data.y,1))
 		loss = criterion(pred, torch.unsqueeze(test_data.y,1))
 		total_loss += loss.item()
-	print("MSE for test is: ", total_loss / len(loader))
+	print("MSE for test is: ", total_loss / len(test_loader))
 
 	vals.sort(key=lambda tup:tup[1])
 
