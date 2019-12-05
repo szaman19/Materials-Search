@@ -21,7 +21,7 @@ class Net(torch.nn.Module):
 		self.conv1 = GraphConv(11, 128) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.5
-		self.pool1 = TopKPooling(128, ratio=0.5)
+		self.pool1 = TopKPooling(128, ratio=0.8)
 		
 		#channel in is 128. channel out is 128
 		self.conv2 = GraphConv(128,128)
@@ -41,6 +41,7 @@ class Net(torch.nn.Module):
 		self.lin1 = torch.nn.Linear(1024, 256)
 		self.bn1 = torch.nn.BatchNorm1d(num_features=256)
 		self.lin2 = torch.nn.Linear(256,64)
+		self.bn2 = torch.nn.BatchNorm1d(num_features=64)	
 		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
 
 	def forward(self, data):
@@ -68,7 +69,8 @@ class Net(torch.nn.Module):
 		
 		x = self.bn1(F.relu(self.lin1(x)))
 		x = F.dropout(x, p=.1, training = self.training)
-		x = F.relu(self.lin2(x))
+		x = self.bn2(F.relu(self.lin2(x)))
+		x = F.dropout(x, p=.1, training = self.training)
 		x = self.lin3(x)
 		return x
 
@@ -80,7 +82,7 @@ def main():
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
 	training_data_list = pickle.load(open('inverse_sparse_train_data_half_precision_sp.p','rb'))
-	loader = DataLoader(training_data_list, batch_size = 64)
+	loader = DataLoader(training_data_list, batch_size = 32)
 
 	# for data in loader:
 	# 	print(data)
@@ -92,14 +94,13 @@ def main():
 	model = Net(11).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
-	epoch = 1000
+	epoch = 100
 	print("Starting Training:")
 	print("*"*40)
 	model.train()
 	for i in range(epoch):
 		model.train()
 		# optimizer.zero_grad()
-
 		training_loss = 0
 		# count = 0
 		for data in loader:
@@ -144,8 +145,8 @@ def main():
 	total_loss = 0
 
 	vals = []
-	loader = DataLoader(training_data_list, batch_size=1)
-	for test_data in loader:
+	# loader = DataLoader(training_data_list, batch_size=1)
+	for test_data in test_loader:
 		data = test_data.to(device)
 		with torch.no_grad():
 			pred= model(data)
