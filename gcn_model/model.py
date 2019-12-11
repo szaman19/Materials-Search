@@ -18,7 +18,7 @@ class Net(torch.nn.Module):
 		super(Net, self).__init__()
 		
 		#channel in is  size of input features, channel out is 128
-		self.conv1 = GraphConv(11, 128) 
+		self.conv1 = GraphConv(13, 128) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.5
 		self.pool1 = TopKPooling(128, ratio=0.5)
@@ -81,17 +81,14 @@ def main():
 
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	training_data_list = pickle.load(open('inverse_dense_train_data_PLD.p','rb'))
-	loader = DataLoader(training_data_list, batch_size = 4)
+	training_data_list = pickle.load(open('radius_sparse_train_data_PLD.p','rb'))
+	loader = DataLoader(training_data_list, batch_size = 1)
 
-	# for data in loader:
-	# 	print(data)
-	# 	print(data.y)
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
-	test_dl = pickle.load(open('inverse_dense_test_data_PLD.p','rb'))
-	test_loader = DataLoader(test_dl, batch_size=4)
+	test_dl = pickle.load(open('radius_sparse_test_data_PLD.p','rb'))
+	test_loader = DataLoader(test_dl, batch_size=1)
 
-	model = Net(11).to(device)
+	model = Net(13).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
 	epoch = 50
