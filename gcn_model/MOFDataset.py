@@ -135,17 +135,20 @@ class MOFDataset():
 
 
 	def get_feature_matrix(self, structure, num_nodes):
-		feature_matrix = torch.zeros(num_nodes,13, dtype=torch.float)
+		feature_matrix = torch.zeros(num_nodes,4, dtype=torch.float)
 
 		counter = 0
 		for each in structure.sites:
 			# vec = self.one_hot_encode(str(each.specie))
 			# arr.append(vec)
-			index = self.one_hot_encode(str(each.specie))
-			feature_matrix[counter][index] = 1
+			# index = self.one_hot_encode(str(each.specie))
+			# feature_matrix[counter][index] = 1
 			element = Element(each.specie)
-			feature_matrix[counter][11] = element.atomic_radius_calculated
-			feature_matrix[counter][12] = element.atomic_mass
+			feature_matrix[counter][0] = element.atomic_radius_calculated
+			feature_matrix[counter][1] = element.atomic_mass
+			feature_matrix[counter][2] = element.row
+			feature_matrix[counter][3] = element.mendeleev_no
+
 			counter +=1
 
 		return feature_matrix
