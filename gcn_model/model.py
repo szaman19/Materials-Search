@@ -18,31 +18,31 @@ class Net(torch.nn.Module):
 		super(Net, self).__init__()
 		
 		#channel in is  size of input features, channel out is 128
-		self.conv1 = GraphConv(13, 128) 
+		self.conv1 = GraphConv(13, 32) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.5
-		self.pool1 = TopKPooling(128, ratio=0.5)
+		self.pool1 = TopKPooling(32, ratio=0.5)
 		
 		#channel in is 128. channel out is 128
-		self.conv2 = GraphConv(128,128)
+		self.conv2 = GraphConv(32,32)
 
 		#channel in is 128, channel out is 128. Ratio is 0.8
-		self.pool2 = TopKPooling(128, ratio=0.8)
+		self.pool2 = TopKPooling(32, ratio=0.8)
 
-		self.conv3 = GraphConv(128, 128)
+		self.conv3 = GraphConv(32, 32)
 
-		self.pool3 = TopKPooling(128, ratio=0.8)
+		self.pool3 = TopKPooling(32, ratio=0.8)
 		
-		self.conv4 = GraphConv(128, 128)
+		self.conv4 = GraphConv(32, 32)
 
-		self.pool4 = TopKPooling(128, ratio=0.8)
+		self.pool4 = TopKPooling(32, ratio=0.8)
 
 
-		self.lin1 = torch.nn.Linear(1024, 256)
-		self.bn1 = torch.nn.BatchNorm1d(num_features=256)
-		self.lin2 = torch.nn.Linear(256,64)
-		self.bn2 = torch.nn.BatchNorm1d(num_features=64)	
-		self.lin3 = torch.nn.Linear(64, 1) #Continuous output
+		self.lin1 = torch.nn.Linear(256, 128)
+		self.bn1 = torch.nn.BatchNorm1d(num_features=128)
+		self.lin2 = torch.nn.Linear(128,16)
+		self.bn2 = torch.nn.BatchNorm1d(num_features=16)	
+		self.lin3 = torch.nn.Linear(16, 1) #Continuous output
 
 	def forward(self, data):
 		x, edge_index, batch, weight = data.x, data.edge_index, data.batch, data.weight
@@ -70,7 +70,7 @@ class Net(torch.nn.Module):
 		x = F.relu(self.lin1(x))
 		x = F.dropout(x, p=.2, training = self.training)
 		x = F.relu(self.lin2(x))
-		x = F.dropout(x, p=.5, training = self.training)
+		#x = F.dropout(x, p=.5, training = self.training)
 		x = self.lin3(x)
 		return x
 
@@ -81,17 +81,17 @@ def main():
 
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	training_data_list = pickle.load(open('radius_sparse_train_data_PLD.p','rb'))
-	loader = DataLoader(training_data_list, batch_size = 1)
+	training_data_list = pickle.load(open('radius_sparse_train_data_LCD.p','rb'))
+	loader = DataLoader(training_data_list, batch_size = 64)
 
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
-	test_dl = pickle.load(open('radius_sparse_test_data_PLD.p','rb'))
-	test_loader = DataLoader(test_dl, batch_size=1)
+	test_dl = pickle.load(open('radius_sparse_test_data_LCD.p','rb'))
+	test_loader = DataLoader(test_dl, batch_size=256)
 
 	model = Net(13).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
-	epoch = 50
+	epoch = 3000
 	print("Starting Training:")
 	print("*"*40)
 	model.train()
@@ -179,7 +179,7 @@ def main():
 	axes = plt.gca()
 	axes.set_ylim([0,16])
 	plt.legend()
-	plt.savefig("atom_species_pld.png", format="png")
+	plt.savefig("atom_species_lcd.png", format="png")
 	# # plt.show()
 
 
