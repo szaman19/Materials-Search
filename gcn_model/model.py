@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch_geometric.data import DataLoader
 from torch_geometric.nn import TopKPooling
+from torch_geometric.nn import Set2Set
 from torch_geometric.nn import GraphConv as GraphConv
 from torch_geometric.nn import global_mean_pool as gap
 from torch_geometric.nn import global_max_pool as gmp
@@ -37,6 +38,7 @@ class Net(torch.nn.Module):
 
 		self.pool4 = TopKPooling(32, ratio=0.8)
 
+		self.set2set = Set2Set(32, processing_steps=3)
 
 		self.lin1 = torch.nn.Linear(256, 128)
 		self.bn1 = torch.nn.BatchNorm1d(num_features=128)
@@ -67,6 +69,7 @@ class Net(torch.nn.Module):
 		x = torch.cat([x1, x2, x3, x4], dim=1)
 
 		
+		x = self.set2set(x, batch)
 		x = F.relu(self.lin1(x))
 		x = F.dropout(x, p=.2, training = self.training)
 		x = F.relu(self.lin2(x))
