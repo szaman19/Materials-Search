@@ -83,11 +83,11 @@ def main():
 
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	training_data_list = pickle.load(open('radius_sparse_train_data_LCD.p','rb'))
+	training_data_list = pickle.load(open('sparse_train_data_half_precision_sp.p','rb'))
 	loader = DataLoader(training_data_list, batch_size = 64)
 
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
-	test_dl = pickle.load(open('radius_sparse_test_data_LCD.p','rb'))
+	test_dl = pickle.load(open('sparse_test_data_half_precision_sp.p','rb'))
 	test_loader = DataLoader(test_dl, batch_size=256)
 
 	model = Net(13).to(device)
