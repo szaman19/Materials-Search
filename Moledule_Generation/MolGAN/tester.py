@@ -55,18 +55,7 @@ def main():
 	print(index.shape)
 	print(value.shape)
 
-	data = Data()
-	data.x = node_hat
-	data.edge_index = index
-	data.edge_attr = value
-	data.y = fake_label
-
-	
-
-
-
-
-
+	data = Data(x=x, edge_index=index, edge_attr=value, y=fake_label)
 
 
 
