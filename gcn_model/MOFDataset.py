@@ -97,7 +97,8 @@ class MOFDataset():
 					data.x = feature_matrix
 						# data.x = torch.ones(num_nodes,1)
 							# data.x = feature_matrix
-					data.y = labels['LCD'][counter]
+					# data.y = labels['LCD'][counter]
+					data.y = 1
 						# print(file, num_nodes, labels['LCD'][counter])
 							
 					dataset.append(data)
