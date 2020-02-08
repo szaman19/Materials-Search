@@ -19,7 +19,7 @@ class Net(torch.nn.Module):
 		super(Net, self).__init__()
 		
 		#channel in is  size of input features, channel out is 128
-		self.conv1 = GraphConv(4, 32) 
+		self.conv1 = GraphConv(11, 32) 
 
 		#channel in is 128, channel out is 128. Ratio is 0.5
 		self.pool1 = TopKPooling(32, ratio=0.5)
@@ -83,11 +83,15 @@ def main():
 
 	# training_data_list = MOFDataset.MOFDataset(train=True).get_data()
 
-	training_data_list = pickle.load(open('sparse_train_data_half_precision_sp.p','rb'))
+	# training_data_list = pickle.load(open('sparse_train_data_half_precision_sp.p','rb'))
+	training_data_list = pickle.load(open('pickled_data.p','rb'))
+	
 	loader = DataLoader(training_data_list, batch_size = 64)
 
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
-	test_dl = pickle.load(open('sparse_test_data_half_precision_sp.p','rb'))
+	# test_dl = pickle.load(open('sparse_test_data_half_precision_sp.p','rb'))
+	test_dl = pickle.load(open('pickled_test_data.p','rb'))
+	
 	test_loader = DataLoader(test_dl, batch_size=256)
 
 	model = Net(13).to(device)

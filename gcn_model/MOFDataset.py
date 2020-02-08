@@ -84,7 +84,7 @@ class MOFDataset():
 				distance_matrix = structure.distance_matrix
 
 				num_nodes = distance_matrix.shape[0]
-				if (num_nodes < 2000):
+				if (num_nodes < 32):
 
 					# distance_matrix = ((distance_matrix == 0)*1000) + distance_matrix 
 					# distance_matrix = 1 / distance_matrix
@@ -135,19 +135,19 @@ class MOFDataset():
 
 
 	def get_feature_matrix(self, structure, num_nodes):
-		feature_matrix = torch.zeros(num_nodes,4, dtype=torch.float)
+		feature_matrix = torch.zeros(num_nodes,11, dtype=torch.float)
 
 		counter = 0
 		for each in structure.sites:
 			# vec = self.one_hot_encode(str(each.specie))
 			# arr.append(vec)
-			# index = self.one_hot_encode(str(each.specie))
-			# feature_matrix[counter][index] = 1
-			element = Element(each.specie)
-			feature_matrix[counter][0] = element.atomic_radius_calculated
-			feature_matrix[counter][1] = element.atomic_mass
-			feature_matrix[counter][2] = element.row
-			feature_matrix[counter][3] = element.mendeleev_no
+			index = self.one_hot_encode(str(each.specie))
+			feature_matrix[counter][index] = 1
+			# element = Element(each.specie)
+			# feature_matrix[counter][0] = element.atomic_radius_calculated
+			# feature_matrix[counter][1] = element.atomic_mass
+			# feature_matrix[counter][2] = element.row
+			# feature_matrix[counter][3] = element.mendeleev_no
 
 			counter +=1
 
