@@ -10,7 +10,7 @@ from torch_geometric.nn import global_max_pool as gmp
 
 class Generator(nn.Module):
 	"""docstring for Generator"""
-	def __init__(self, input_vector_dim = 32, num_nodes=32, num_features=4, num_edge_features = 1):
+	def __init__(self, input_vector_dim = 32, num_nodes=32, num_features=11, num_edge_features = 1):
 		super(Generator, self).__init__()
 
 		#Z vector to generate continuous graph from. Default is 32 
@@ -54,9 +54,9 @@ class Generator(nn.Module):
 		return adj_mat, feat_mat 
 
 
-class Discriminator(object):
+class Discriminator(nn.Module):
 	"""docstring for Discriminator"""
-	def __init__(self, num_input_features = 4):
+	def __init__(self, num_input_features = 11):
 		super(Discriminator, self).__init__()
 		self.atom_types = num_input_features
 
@@ -67,22 +67,24 @@ class Discriminator(object):
 		self.pool2 = TopKPooling(128, ratio = 0.8)
 
 
-		self.lin1 = nn.Linear(128, 64)
+		self.lin1 = nn.Linear(512, 64)
 		self.lin2 = nn.Linear(64,16)
 		self.lin3 = nn.Linear(16,1)
 
 	def forward(self, data):
-		x, edge_index, batch, weight = data.x, data.edge_index, data.batch, data.weight
+		x, edge_index, batch = data.x, data.edge_index, data.batch
 
-		x = F.relu (self.conv1(x,edge_index, weight))
-		x, edge_index, weight, batch, _,_ = self.pool1(x, edge_index, weight, batch)
+		x = F.relu (self.conv1(x,edge_index))
+
+		x, edge_index,_, batch, _,_ = self.pool1(x, edge_index, None, batch)
 		x1 = torch.cat([gmp(x,batch),  gap(x,batch)], dim=1)
 
-		x = F.relu (self.conv1(x,edge_index, weight))
-		x, edge_index, weight, batch, _,_ = self.pool2(x, edge_index, weight, batch)
+		x = F.relu (self.conv2(x,edge_index))
+		x, edge_index, _, batch, _,_ = self.pool2(x, edge_index, None,batch)
 		x2 = torch.cat([gmp(x,batch),  gap(x,batch)], dim=1)
 
 		x = torch.cat([x1,x2], dim=1)
+		
 		x = F.relu(self.lin1(x))
 		x = F.relu(self.lin2(x))
 		x = F.relu(self.lin3(x))
