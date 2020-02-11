@@ -48,8 +48,8 @@ def gen_samples(generator, device):
 
 def main():
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-	Gen = Generator()
-	D = Discriminator()
+	Gen = Generator().to(device)
+	D = Discriminator().to(device)
 	# optimizerD = optim
 
 
@@ -61,7 +61,7 @@ def main():
 	optimizerD = optim.Adam(D.parameters(), lr=0.0001, betas=(0.9, 0.999))
 	optimizerG = optim.Adam(Gen.parameters(), lr=0.01, betas=(0.9, 0.999))
 
-	NUM_EPOCHS = 20
+	NUM_EPOCHS = 200
 
 	for epoch in range(NUM_EPOCHS):
 			##
@@ -92,7 +92,7 @@ def main():
 		disc_loss.backward()
 		optimizerD.step()
 		print("Discriminator Loss: ",disc_loss.item(), 
-			"Real Loss:", real_loss.item(), " Fake Loss", fake_loss.item())
+			"Real Loss:", -real_loss.item(), " Fake Loss", fake_loss.item())
 			##
 			## Second train the generator
 			##
@@ -108,7 +108,7 @@ def main():
 		optimizerG.zero_grad()
 		g_fake_loss.backward()
 		optimizerG.step()
-		print("Generator Loss: ", g_fake_loss.item())
+		print("Generator Loss: ", -g_fake_loss.item())
 		print("*" * 40)
 			##
 			## Not really sure here
