@@ -23,10 +23,10 @@ def post_process(inp):
 
 	return [delistifiy(e) for e in (softmax)]
 
-def gen_samples(generator, device):
+def gen_samples(generator, device, num_samples=32):
 	fake_data = []
 	fake_label = 0
-	for i in range(32):
+	for i in range(num_samples):
 		z = np.random.normal(0,1,size=(1,32))
 		z = torch.from_numpy(z).to(device).float()
 		adj, node = generator(z)
@@ -69,7 +69,7 @@ def main():
 			##
 
 		training_data_list = pickle.load(open('MOF_GENERATOR_32.p','rb'))
-		fake_data = gen_samples(Gen, device)
+		fake_data = gen_samples(Gen, device, num_samples=16)
 		true_loader = DataLoader(training_data_list, batch_size=16)
 		fake_loader = DataLoader(fake_data, batch_size=16) 
 
@@ -113,5 +113,6 @@ def main():
 			##
 			## Not really sure here
 			##
+	
 if __name__ == '__main__':
 	main()

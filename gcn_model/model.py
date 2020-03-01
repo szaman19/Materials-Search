@@ -26,11 +26,11 @@ def main():
 
 	# test_dl = MOFDataset.MOFDataset(train=False).get_data()
 	# test_dl = pickle.load(open('sparse_test_data_half_precision_sp.p','rb'))
-	test_dl = pickle.load(open('pickled_test_data.p','rb'))
+	# test_dl = pickle.load(open('pickled_test_data.p','rb'))
 	
-	test_loader = DataLoader(test_dl, batch_size=256)
+	# test_loader = DataLoader(test_dl, batch_size=256)
 
-	model = Net(13).to(device)
+	model = Net.Net(13).to(device)
 	criterion = torch.nn.MSELoss()
 	optimizer = torch.optim.Adam(model.parameters(), lr=3E-4)
 	epoch = 3000
