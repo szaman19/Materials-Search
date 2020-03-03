@@ -31,7 +31,11 @@ class CIFtoTensor(object):
 		struct = struct[0]
 		return struct.distance_matrix
 
-	def to3DTensor(pymat_struc ,atom_species=[], dimensions = (32,32,32), gaussian_blurring=True, half_precision = False):
+	def to3DTensor(pymat_struc ,
+		atom_species=[], 
+		dimensions = (32,32,32), 
+		gaussian_blurring=True, 
+		half_precision = False, normalize = 134, spread = 0.5):
 		
 
 		if(gaussian_blurring):
@@ -51,8 +55,8 @@ class CIFtoTensor(object):
 		dimensions = (len(atom_species),dimensions[0],dimensions[1], dimensions[2])
 		mol_tensor = np.zeros(dimensions)
 
-		MAX = 31
-		NORMALIZE = 1
+		MAX = dimensions[1]-1
+		NORMALIZE = normalize
 		shifted = False
 
 		site_0 = None
@@ -77,13 +81,13 @@ class CIFtoTensor(object):
 				assert y >= 0 and y <= MAX
 				assert z >= 0 and z <= MAX
 
-				mol_tensor[specie] =add_mol_gaussian(mol_tensor,specie,x,y,z)
+				mol_tensor[specie] =add_mol_gaussian(mol_tensor,specie,x,y,z,variance=spread)
 		if (site_0):
 			site_0_specie = atom_species.index(str(site_0.specie))
 			if(shifted):
-				mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, MAX,MAX,MAX)
+				mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, MAX,MAX,MAX,variance=spread)
 			else:
-				mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, 0,0,0)
+				mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, 0,0,0,variance=spread)
 
 		#for i in range(len(atom_species)):
 		#	mol_tensor[i] = gaussian_filter(mol_tensor[i], sigma = 0.5)
