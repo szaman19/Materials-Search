@@ -66,23 +66,23 @@ class CIFtoTensor(object):
 				z = 0
 				if(site.x < 0):
 					shifted = True
-					x = MAX - int(abs(site.x) / NORMALIZE)
+					x = MAX - (abs(site.x) / NORMALIZE)
 				if(site.x < 0):
 					shifted = True
-					y = MAX - int(abs(site.y) / NORMALIZE)
+					y = MAX - (abs(site.y) / NORMALIZE)
 				if(site.x < 0):
 					shifted = True
-					z = MAX - int(abs(site.z) / NORMALIZE)
+					z = MAX - (abs(site.z) / NORMALIZE)
 				assert x >= 0 and  x <= MAX
 				assert y >= 0 and y <= MAX
 				assert z >= 0 and z <= MAX
 
-				mol_tensor[specie] =add_mol_disrete(mol_tensor,specie,x,y,z)
+				mol_tensor[specie] =add_mol_gaussian(mol_tensor,specie,x,y,z)
 		site_0_specie = atom_species.index(str(site_0.specie))
 		if(shifted):
-			mol_tensor[site_0_specie] = add_mol_disrete(mol_tensor, site_0_specie, MAX,MAX,MAX)
+			mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, MAX,MAX,MAX)
 		else:
-			mol_tensor[site_0_specie] = add_mol_disrete(mol_tensor, site_0_specie, 0,0,0)
+			mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, 0,0,0)
 
 		for i in range(len(atom_species)):
 			mol_tensor[i] = gaussian_filter(mol_tensor[i], sigma = 0.5)
@@ -92,6 +92,20 @@ def add_mol_disrete(tensor, specie, x, y, z):
 	tensor[specie][x][y][z] += 1
 	return tensor[specie]
 
+def add_mol_gaussian(tensor, specie, x,y,z, variance=0.5):
+	shape = tensor[specie].shape
+	distances = np.zeros(shape)
+
+	for x_i in range(shape[0]):
+		for y_i in range(shape[1]):
+			for z_i in range(shape[2]):
+				distances[x_i][y_i][z_i] = (-0.5)*((x_i - x)**2 + (y_i - y)**2 +(z_i-z)**2)/(variance**2)
+	distances = np.exp(distances)
+	distances = np.power(2/np.pi,3/2) * distances
+	assert distances.shape == shape 
+	tensor[specie] += distances
+	
+	return tensor[specie]
 def Plot3D(tensor):
 	fig = plt.figure(figsize = plt.figaspect(0.25))
 	dims = (32,32,32)
