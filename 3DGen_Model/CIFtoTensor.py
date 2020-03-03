@@ -78,14 +78,15 @@ class CIFtoTensor(object):
 				assert z >= 0 and z <= MAX
 
 				mol_tensor[specie] =add_mol_gaussian(mol_tensor,specie,x,y,z)
-		site_0_specie = atom_species.index(str(site_0.specie))
-		if(shifted):
-			mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, MAX,MAX,MAX)
-		else:
-			mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, 0,0,0)
+		if (site_0):
+			site_0_specie = atom_species.index(str(site_0.specie))
+			if(shifted):
+				mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, MAX,MAX,MAX)
+			else:
+				mol_tensor[site_0_specie] = add_mol_gaussian(mol_tensor, site_0_specie, 0,0,0)
 
-		for i in range(len(atom_species)):
-			mol_tensor[i] = gaussian_filter(mol_tensor[i], sigma = 0.5)
+		#for i in range(len(atom_species)):
+		#	mol_tensor[i] = gaussian_filter(mol_tensor[i], sigma = 0.5)
 
 		return mol_tensor
 def add_mol_disrete(tensor, specie, x, y, z):
