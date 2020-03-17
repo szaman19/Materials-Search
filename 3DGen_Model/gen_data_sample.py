@@ -23,7 +23,7 @@ def main():
         	file_num +=1
         	counter = 0 
         	tensors = []
-        else if (file_num*320 + counter == len(files)):
+        elif (file_num*320 + counter == len(files)):
         	pickle.dump(tensors, "training_mol_tensors_"+str(file_num)+".p")
 
 main()
