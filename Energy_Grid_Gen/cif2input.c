@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#include <time.h>
 
 int main(int argc, char *argv[])
 {
@@ -24,8 +24,6 @@ int main(int argc, char *argv[])
 	//This part defines other parameter needed to write the input file
 	
 	//*************
-
-
 
 	//define file varaiable
 	FILE *fp1, *fp2;
@@ -327,7 +325,28 @@ int main(int argc, char *argv[])
 	fp1 = fopen(argv[1], "r");
 	fp2 = fopen(argv[3], "w+");
 	// write title part
-	fprintf(fp2, "File Name %s\n", argv[1]);
+	fprintf(fp2, "File Name:\n");
+	fprintf(fp2, "%s\n", argv[1]);
+
+	time_t timer;
+	char buffer[26];
+	struct tm* tm_info;
+
+	timer = time(NULL);
+	tm_info = localtime(&timer);
+	strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+	fprintf(fp2, "Created at:\n");
+	fprintf(fp2, "%s\n", buffer);
+
+	if (argc > 4){
+		fprintf(fp2, "Version:\n");
+		fprintf(fp2, "%s\n",argv[4]);
+
+	}else{
+		fprintf(fp2, "Version:\n");
+		fprintf(fp2, "%s\n", "1.1");
+	}
+
 	fprintf(fp2,"Nmaxa Nmaxb Nmaxc:\n");
 	// Nmaxa = a/dL + 3;
 	// Nmaxb = b/dL + 3;

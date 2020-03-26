@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
 #define PI 3.141592653589793
 
 
@@ -67,24 +70,49 @@ int main(int argc, char *argv[])
     double temp_u;
     int i, ii, iii, iiii;
     double dis;
+
+    //define metadata parameters - Added by Shehtab 
+    char inp_file_name[256];
+    double version; 
+    char date_buffer[100];
+    char time_buffer[100];
     //done!!!!!
 
     //read input file parameters
 	fp1 = fopen(argv[1], "r");
-	fgets(str, buffersize, fp1);
-	fscanf(fp1,"%d %d %d\n", &Nmaxa, &Nmaxb, &Nmaxc);
-	fgets(str, buffersize, fp1);
+
+	fgets(str, buffersize, fp1); // File Name
+    fscanf(fp1,"%s\n", inp_file_name);
+    // printf("%s\n", inp_file_name); DEBUG
+
+    fgets(str, buffersize, fp1); // Created at
+    fscanf(fp1,"%s %s\n", date_buffer,  time_buffer);
+    // printf("%s %s\n", date_buffer, time_buffer); DEBUG
+
+    fgets(str, buffersize, fp1); // Version:
+    fscanf(fp1,"%lf\n", &version);
+    // printf("%lf\n", version); DEBUG
+
+    fgets(str, buffersize, fp1); // Nmaxa Nmaxb Nmaxc 
+    fscanf(fp1,"%d %d %d\n", &Nmaxa, &Nmaxb, &Nmaxc);
+	
+    fgets(str, buffersize, fp1); // La Lb Lc dL
 	fscanf(fp1,"%lf %lf %lf %lf\n", &La, &Lb, &Lc, &dL);
-	fgets(str, buffersize, fp1);
-	fscanf(fp1,"%lf %lf %lf\n", &alpha, &beta, &gamma);
+	
+    fgets(str, buffersize, fp1); // Alpha Beta Gamma
+    fscanf(fp1,"%lf %lf %lf\n", &alpha, &beta, &gamma);
+    
     alpha_rad = alpha*PI/180;
     beta_rad = beta*PI/180;
     gamma_rad = gamma*PI/180;
-	fgets(str, buffersize, fp1);
-	fscanf(fp1,"%lf %lf %lf %d %lf %lf\n", &epsilon, &sigma, &cutoff, &FH_signal, &mass, &temperature);
-	fgets(str, buffersize, fp1);
-	fscanf(fp1,"%d\n", &N_atom);
-	fgets(str, buffersize, fp1);
+	
+    fgets(str, buffersize, fp1); // Epsilon(K) Sigma(A) cutoff(A) FH_signal mass(g/mol) Tempearture(K)
+    fscanf(fp1,"%lf %lf %lf %d %lf %lf\n", &epsilon, &sigma, &cutoff, &FH_signal, &mass, &temperature);
+	
+    fgets(str, buffersize, fp1); // Number of atoms
+    fscanf(fp1,"%d\n", &N_atom);
+	
+    fgets(str, buffersize, fp1); // ID diameter(A) Epsilon(K) mass(g/mol) frac_x frac_y frac_z atom_name
 	//done!!!!
 
     //test memory
@@ -160,6 +188,31 @@ int main(int argc, char *argv[])
     /*
     Add versioning here 
     */
+
+    fprintf(fp1, "File Name: %s\n", argv[2]);
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+    timer = time(NULL);
+    tm_info = localtime(&timer);
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    fprintf(fp1, "Created at %s :\n", buffer);
+    fprintf(fp1, "Version: %lf\n", 1.1);
+
+
+    fprintf(fp1, "Input File Name: %s\n", inp_file_name);
+    fprintf(fp1, "Input File Created: %s %s\n",date_buffer, time_buffer);
+    fprintf(fp1, "Input File Generator Version: %lf\n", version);
+
+    fprintf(fp1,"%d\t%d\t%d\n", Nmaxa, Nmaxb, Nmaxc);
+    fprintf(fp1,"La Lb Lc dL\n");
+    fprintf(fp1,"%lf\t%lf\t%lf\t%lf\n", La, Lb, Lc, dL);
+    fprintf(fp1,"Alpha Beta Gamma\n");
+    fprintf(fp1,"%lf\t%lf\t%lf\n", alpha, beta, gamma);
+    fprintf(fp1,"Epsilon(K) Sigma(A) cutoff(A) FH_signal mass(g/mol) Tempearture(K)\n");
+    fprintf(fp1,"%lf\t%lf\t%lf\t%d\t%lf\t%lf\n", epsilon, sigma, cutoff, FH_signal, mass, temperature);
+    fprintf(fp1,"Number of atoms\n");
+    fprintf(fp1,"%d\n", N_atom);    
 
     if (FH_signal==0)
     {
