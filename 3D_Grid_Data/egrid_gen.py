@@ -22,33 +22,23 @@ def multi_processing(file_names, save_file_dir = "grid_data/test/" ):
 	file_name = file_names.split("/")[2]
 	save_file_name = save_file_dir + file_name + ".grid"
 	out = subprocess.run(["./egrid",file_names, save_file_name])
-	return out
+	return out.returncode
+
 def main():
 	training_files = glob.glob("input_data/training/*.inp")
 	test_files = glob.glob("input_data/test/*.inp")
 	
-	counter = 1
-	n = int(len(training_files) // 40)
-	file_lists = [training_files[i:i+n] for i in range(0, len(training_files), n)]
+	training_files = [(x, "grid_data/training/") for x in training_files]
+	test_files = [(x, "grid_data/test/") for x in test_files]
 
-	tot = 0
 
-	#print(type(file_lists[0]))
-	#print(len(file_lists))
-	pool=  mp.Pool(processes=41)
+	pool=  mp.Pool(processes=40)
 	#results = [pool.apply(gengrid, args=(x, )) for x in file_lists]
-	results = pool.map(multi_processing, test_files)
+	results = pool.starmap(multi_processing, test_files)
 	print(results)
-	#print(results)
-	#counter = 1
 	
-	'''
-	for file in test_files:
-		file_name = file[16:]
-		save_file_name = "grid_data/test/"+file_name[:-4]+".grid"
-		print(subprocess.run(["./egrid",file,save_file_name ]))
-		print(counter, " : ", len(test_files))
-		counter  +=1
+	pool=  mp.Pool(processes=40)
+	results = pool.starmap(multi_processing, training_files)
+	print(results)
 
-	'''
 main()

@@ -25,8 +25,8 @@ vext_compile: $(VEXT)
 	$(CC) -c $(VEXT)
 
 vext_link: vext_compile
-	$(CC) $(VEXT_OBJ) -lm -o ./Vext
+	$(CC) $(VEXT_OBJ) -lm -o ./egrid
 
 vext_test: vext_link
-	./Vext example.inp example.grid
+	./egrid example.inp example.grid
 
