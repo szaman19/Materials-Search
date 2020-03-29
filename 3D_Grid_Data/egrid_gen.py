@@ -22,6 +22,7 @@ def multi_processing(file_names, save_file_dir = "grid_data/test/" ):
 	file_name = file_names.split("/")[2]
 	save_file_name = save_file_dir + file_name + ".grid"
 	out = subprocess.run(["./egrid",file_names, save_file_name])
+	print(out.returncode)
 	return out.returncode
 
 def main():
