@@ -86,10 +86,7 @@ class INPtoTensor(object):
 		for x_i in range(shape[0]):
 			for y_i in range(shape[1]):
 				for z_i in range(shape[2]):
-					x_i_val = (x_i / shape[0]) * self.a
-					y_i_val = (y_i / shape[1]) * self.b 
-					z_i_val = (z_i / shape[2]) * self.c
-
+					x_i_val,y_i_val,z_i_val = self.frac2car((x_i / shape[0]),(y_i / shape[1]),(z_i / shape[2])) 
 					distances[x_i][y_i][z_i] = (-0.5)*((x_i_val - x)**2 + (y_i_val - y)**2 +(z_i_val-z)**2)/(variance**2)
 		distances = np.exp(distances)
 		distances = np.power(2/np.pi,3/2) * distances
@@ -165,22 +162,10 @@ def Plot3D(tensor):
 
 
 def main():
-	# inp_file = open("example.inp", 'r')
 
-	# file_data= inp_file.readlines()
-
-
-	# print(file_data[9])
-	# for x in file_data[17:]:
-	# 	x = x.strip().split()
-	# 	print(x[-1],x[-2],x[-3],x[-4])
 	
 	inp_to_tensor = INPtoTensor("AHOKOX_clean.inp")
 	mof_tensor = inp_to_tensor.get_Tensor()
-
-	#for atoms in inp_to_tensor.atoms:
-	#	print(atoms.specie, atoms.x,atoms.y,atoms.z)
-
 	Plot3D(mof_tensor)
 
 	'''

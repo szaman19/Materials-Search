@@ -33,8 +33,4 @@ def main():
 	pickle.dump(results, test_pickle_file)
 
 
-
-
-
-
 main()
