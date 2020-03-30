@@ -124,7 +124,7 @@ def Plot3D(tensor):
 	# for i in range(11):
 		# ax.voxels(tensor[i], edgecolor="k")
 	ax1.voxels(tensor[1], edgecolor="k", facecolor="blue")
-	ax2.voxels(tensor[5], edgecolor="k", facecolor = "orange")
+	ax2.voxels(tensor[5], edgecolor="k", facecolor="orange")
 	ax3.voxels(tensor[3], edgecolor="k", facecolor="yellow")
 	ax4.voxels(tensor[4], edgecolor="k", facecolor="red")
 
