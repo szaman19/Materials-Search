@@ -1,6 +1,8 @@
 import numpy as np
 from pymatgen.io.cif import CifParser
-
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 class Atom(object):
 	"""docstring for Atom"""
 	def __init__(self, specie, x,y,z):
@@ -84,7 +86,11 @@ class INPtoTensor(object):
 		for x_i in range(shape[0]):
 			for y_i in range(shape[1]):
 				for z_i in range(shape[2]):
-					distances[x_i][y_i][z_i] = (-0.5)*((x_i - x)**2 + (y_i - y)**2 +(z_i-z)**2)/(variance**2)
+					x_i_val = (x_i / shape[0]) * self.a
+					y_i_val = (y_i / shape[1]) * self.b 
+					z_i_val = (z_i / shape[2]) * self.c
+
+					distances[x_i][y_i][z_i] = (-0.5)*((x_i_val - x)**2 + (y_i_val - y)**2 +(z_i_val-z)**2)/(variance**2)
 		distances = np.exp(distances)
 		distances = np.power(2/np.pi,3/2) * distances
 		assert distances.shape == shape 
@@ -126,7 +132,36 @@ class INPtoTensor(object):
 
 
 
-		
+def Plot3D(tensor):
+	fig = plt.figure(figsize = (20,20))
+	dims = (32,32,32)
+	ax1 = fig.add_subplot(2,2,1,projection='3d')
+	ax2 = fig.add_subplot(2,2,2,projection='3d')
+	ax3 = fig.add_subplot(2,2,3,projection='3d')
+	ax4 = fig.add_subplot(2,2,4,projection='3d')
+
+	Oxygen = tensor[1]
+	Copper = tensor[5]
+	Carbon = tensor[3]
+	Phosphorus = tensor[4]
+	Oxygen[Oxygen < 1e-5] = 0
+	Copper[Copper < 1e-5] = 0
+	Carbon[Carbon < 1e-5] = 0
+	Phosphorus[Phosphorus < 1e-5] = 0
+
+
+
+	ax1.voxels(Oxygen, edgecolor="k", facecolor="blue")
+	ax2.voxels(Copper, edgecolor="k", facecolor = "orange")
+	ax3.voxels(Carbon, edgecolor="k", facecolor="yellow")
+	ax4.voxels(Phosphorus, edgecolor="k", facecolor="red")
+
+	ax1.set_title("Oxygen")
+	ax2.set_title("Copper")
+	ax3.set_title("Carbon")
+	ax4.set_title("Phosphorus")
+
+	plt.show()		
 
 
 def main():
@@ -146,7 +181,7 @@ def main():
 	#for atoms in inp_to_tensor.atoms:
 	#	print(atoms.specie, atoms.x,atoms.y,atoms.z)
 
-	print(mof_tensor.shape)
+	Plot3D(mof_tensor)
 
 	'''
 	For Testing
