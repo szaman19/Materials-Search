@@ -11,26 +11,27 @@ class Generator(nn.Module):
 		self.length = cube_side
 		self.num_channels = num_atoms
 
+		#inp.vector x 1 x 1 x 1
 		#Conv3d(in_channels, out_channels, kerbel_size, stride, padding)
 		self.main = nn.Sequential(
 			
-			nn.ConvTranspose3d(self.inp_vector, self.length*8, 4,2,0), #
+			nn.ConvTranspose3d(self.inp_vector, self.length*8, 4,2,0), # self.length*8 x 4 x 4 x 4 
 			nn.BatchNorm3d(512),
 			nn.Tanh(),
 
-			nn.ConvTranspose3d(self.length*8, self.length*4, 4,2,1), #
+			nn.ConvTranspose3d(self.length*8, self.length*4, 4,2,1), # self.length*4 x 8 x 8 x 8
 			nn.BatchNorm3d(256),
 			nn.Tanh(),
 
-			nn.ConvTranspose3d(self.length*4, self.length*2, 4,2,1), #
+			nn.ConvTranspose3d(self.length*4, self.length*2, 4,2,1), # self.length*2 x 16 x 16 x 16
 			nn.BatchNorm3d(128),
 			nn.Tanh(),
 
-			nn.ConvTranspose3d(self.length*2, self.length, 4,2,1), #
+			nn.ConvTranspose3d(self.length*2, self.length, 4,2,1), # self.length x 32 x 32 x 32 
 			nn.BatchNorm3d(64),
 			nn.Tanh(),
 
-			nn.ConvTranspose3d(self.length, self.num_channels, 4,2,1), #
+			nn.ConvTranspose3d(self.length, self.num_channels, 4,2,1), #self.num_channels x 64 x 64 x 64
 			nn.Sigmoid()
 			)
 	def forward(self, x):
