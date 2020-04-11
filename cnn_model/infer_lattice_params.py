@@ -2,7 +2,10 @@ import torch
 import torch.nn as nn 
 from torch.autograd import Variable 
 
-from mof_dataset import MOFDataset 
+import sys
+# sys.path.append("..")
+
+from mof_dataset import MOFDataset  
 
 
 class Conv_Model(nn.Module):
@@ -11,9 +14,8 @@ class Conv_Model(nn.Module):
  		super(Conv_Model, self).__init__()
  		
  		self.Num_features = num_features
-		self.Z_dim = z_dim
-
-		self.main = nn.Sequential(
+ 		self.Z_dim = z_dim		
+ 		self.main = nn.Sequential(
 			nn.Conv3d(self.Num_features, self.Z_dim // 8, 4,2,1), #32
 			nn.BatchNorm3d(self.Z_dim // 8),
 			nn.LeakyReLU(0.2), 
@@ -32,11 +34,11 @@ class Conv_Model(nn.Module):
 
 			nn.Conv3d(self.Z_dim, self.Z_dim, 2,2,0), #1
 			)
-		def forward(self, x):
-			x = self.main(x)
-			x = x.view(-1, x.size(0))
 
-			return x 
+ 	def forward(self, x):
+ 		x = self.main(x)
+ 		x = x.view(-1, x.size(0))
+ 		return x 
 
 
 def main():
@@ -47,7 +49,10 @@ def main():
 	num_features = 12 
 	grid_size = 32 
 
-	train_loader = MOFDataset.get_data_loader("../3D_Grid_data/Test_MOFS.p")
+	batch_size = 16
+
+	train_loader = MOFDataset.get_data_loader("../3D_Grid_data/Test_MOFS.p". batch_size)
+
 
 if __name__ == '__main__':
 
