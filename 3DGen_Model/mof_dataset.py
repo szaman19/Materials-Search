@@ -9,8 +9,10 @@ import Voxel_MOF
 
 
 class MOFDataset(Dataset):
-    def __init__(self, path, transform=None):
+    def __init__(self, path, no_grid=False, no_loc=False,transform=None):
         self.path = path
+        self.no_grid = no_grid
+        self.no_loc = no_loc
         path = Path(path)
         with path.open("rb") as f:
             self.data: List[Voxel_MOF] = pickle.load(f)
@@ -20,12 +22,17 @@ class MOFDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        return self.data[idx].data
+        if self.no_grid:
+            return self.data[idx].loc_tensor
+        elif self.no_loc:
+            return self.data[idx].grid_tensor    
+        else:
+            return self.data[idx].data
 
     @staticmethod
-    def get_data_loader(path: str, batch_size: int):
+    def get_data_loader(path: str, batch_size: int, no_grid=False, no_loc=False):
         return torch.utils.data.DataLoader(
-            MOFDataset(path),
+            MOFDataset(path, no_grid=no_grid, no_loc=no_loc),
             batch_size=batch_size,
             shuffle=True,
         )

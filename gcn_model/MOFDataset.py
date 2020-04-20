@@ -7,109 +7,124 @@ import pandas as pd
 import numpy as np
 import torch_geometric.utils
 import networkx as nx
-from multiprocessing import Pool
+import multiprocessing as mp 
+import pickle
+
 import warnings
+
+import argparse
+
+import resource
+rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
+resource.setrlimit(resource.RLIMIT_NOFILE, (8192, rlimit[1]))
+
+torch.multiprocessing.set_sharing_strategy('file_system')
+
+
 warnings.filterwarnings("ignore", category=FutureWarning)
 torch.set_printoptions(profile="full")
 
 class MOFDataset():
 	"""docstring for MOFDataset"""
-	def __init__(self, 
-		train = True):
+	def __init__(self,
+		save_file_name, 
+		train_dir = "/data/training",
+		test_dir = "/data/test", 
+		label = "LCD"):
+		
 		super(MOFDataset, self).__init__()
 
-		if train:
-			self.data_dir = "/data/training/"
-		else:
-			self.data_dir = "/data/test/"
+		self.train_dir = train_dir
+		self.test_dir = test_dir
+		self.save_file_name = save_file_name
+		self.label_type = label
 
-	def get_data(self):
-		""" returns a list of Data objects """
-		# print(type(directory)) 
-		# files = glob.glob(self.data_dir+"*.cif")
-		directory = os.getcwd() + self.data_dir
+	def save_data(self):
+
+		train_data = self.get_data(self.train_dir)
+		
+		print("Finished generating training data")
+		train_file_name = "train_"+self.save_file_name + ".p"
+
+		train_file = open(train_file_name, "wb")
+		pickle.dump(train_data, train_file)
+
+		train_file.close()
+
+
+
+		test_data = self.get_data(self.test_dir)
+
+		print("Finished generating test data")
+
+		test_file_name = "test_"+self.save_file_name + ".p"
+
+		test_file = open(test_file_name, "wb")
+		pickle.dump(test_data, test_file)
+
+		test_file.close()
+
+	def get_data_helper(self, structure, y):
+
+		structure = structure
+		distance_matrix = structure.distance_matrix
+
+
+		zero_indices = distance_matrix > 3
+		
+		distance_matrix[zero_indices] = 0
+
+
+		graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
+		num_nodes = distance_matrix.shape[0]
+			# print(num_nodes)
+		feature_matrix = self.get_feature_matrix(structure,num_nodes)
+			
+		data = torch_geometric.utils.from_networkx(graph)
+		# data.x = torch.tensor(feature_matrix, dtype=torch.double)
+		data.x = feature_matrix
+		data.y = y
+		# 
+		# print(labels, " : ", num_nodes, " , ", y)
+		return data		
+
+	def get_data(self, data_dir):
+		directory = os.getcwd() + data_dir +"/"
 
 		labels = pd.read_csv(directory+"properties.csv")
-		# counter = 1
-
 
 		dataset = []
 
-		counter = 0
-
-
 		size = len(labels['filename'])
-		# size = 300
-		# # print(size)
 
-		# for i in range(0,size, 40):
-		# 	num_processes  = 0
-		# 	if (size > i + 40):
-		# 		num_processes = 40
-		# 	else:
-		# 		num_processes = size - i
+		print(size)
 
-		# 	pool = Pool(processes=num_processes)
-		# 	results = [pool.apply_async(self.get_data_helper, args=(labels,i+x)) for x in range(num_processes)]
-		# 	out = [p.get() for p in results]
+		counters = list(range(size))
 
-		# 	for each in out:
-		# 		dataset.append(each)
-		# 	pool.close()
-		# 	pool.join()
-		# 	print("Data Loaded: ", i+num_processes,"/",size)
-
-			# print(out) 
+		directory_list = [directory + file +".cif" for file in labels['filename']]
 
 
+		pool = mp.Pool(processes=40)
+
+		structures = pool.map(self.cif_structure, directory_list)
+
+		pool.close()
 
 
+		labels = list(labels[self.label_type])
+		print(len(structures))
+		print(len(labels))
 
-		# print(feature_matrix)
-		# size = len(labels['filename'])
 
-		# with Pool(processes=20) as pool:
-		# 	dataset = []
-		# 	for i in range(20):
-		# 		resuls = pool.map(self.get_data_helper, args=(labels,arr[i],arr[i] + steps, size, )) 
-		# 		vals = resuls.get()
-		# 		for each in vals:
-		# 			dataset.append(each)
-		# print(dataset)
-		for file in labels['filename']:
-			if(os.path.exists(directory+file+".cif")):
+		print("structure parsing complete")
+		# structures = [self.cif_structure(directory+file+".cif") for file in labels['filename']]
 
-				file  = labels['filename'][counter]
-				structure = self.cif_structure(directory+file+".cif")
-				distance_matrix = structure.distance_matrix
+		data = zip(structures, labels)
 
-				num_nodes = distance_matrix.shape[0]
-				if (num_nodes < 32):
+		pool = mp.Pool(processes=40)
+		dataset = pool.starmap(self.get_data_helper, data)
 
-					# distance_matrix = ((distance_matrix == 0)*1000) + distance_matrix 
-					# distance_matrix = 1 / distance_matrix
-					distance_matrix = (distance_matrix < 3) * distance_matrix
-					graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
-
-					feature_matrix = self.get_feature_matrix(structure, num_nodes)
-							
-					data = torch_geometric.utils.from_networkx(graph)
-					data.x = feature_matrix
-						# data.x = torch.ones(num_nodes,1)
-							# data.x = feature_matrix
-					# data.y = labels['LCD'][counter]
-					data.y = 1
-						# print(file, num_nodes, labels['LCD'][counter])
-							
-					dataset.append(data)
-					
-					print("Elements loaded: ",counter, "/", size)
-
-				counter +=1
-				# if counter == 3:
-				# 	break
-			else:
-				print("Not ok skipping: ", file)
+		pool.close()
 		return dataset
 
 	def cif_structure(self,file_name):
@@ -120,9 +135,6 @@ class MOFDataset():
 
 	def one_hot_encode(self, element):
 		elements = ["H","N","C","O","Co","P","Zn","Ag","Cd","Cu","Fe"]
-		# one_hot_vector = torch.zeros(1,11)
-		# one_hot_vector = np.zeros(len(elements))
-		# one_hot_vector[elements.index(element)] = 1
 		return elements.index(element)
 
 	def one_hot_test(self, val = 0, element="H"):
@@ -154,27 +166,16 @@ class MOFDataset():
 
 		return feature_matrix
 
-	def get_data_helper(self, labels, counter):
-		x = counter
-		directory = os.getcwd() + self.data_dir
-
-		file  = labels['filename'][x]
-		structure = self.cif_structure(directory+file+".cif")
-		distance_matrix = structure.distance_matrix
-
-		graph = nx.from_numpy_matrix(distance_matrix.astype(np.double))
-		num_nodes = distance_matrix.shape[0]
-			# print(num_nodes)
-		feature_matrix = self.get_feature_matrix(structure,num_nodes)
-			
-		data = torch_geometric.utils.from_networkx(graph)
-			# data.x = torch.tensor(feature_matrix, dtype=torch.double)
-		data.x = feature_matrix
-		data.y = labels['LCD'][x]
-		# 
-
-		return data
 
 
 
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument("save_file", help="Save file name")
+	args = parser.parse_args()
+	dataset = MOFDataset(args.save_file)
+	dataset.save_data()
+
+if __name__ == '__main__':
+	main()
 

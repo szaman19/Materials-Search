@@ -51,7 +51,12 @@ def main():
 
 	batch_size = 16
 
-	train_loader = MOFDataset.get_data_loader("../3D_Grid_data/Test_MOFS.p". batch_size)
+	train_loader = MOFDataset.get_data_loader("../3D_Grid_Data/Test_MOFS.p", batch_size)
+
+	for batch, data in enumerate(train_loader):
+		print(batch, type(data[0]), data[0].shape,type(data[1]), type(data[2]))
+		print(data[2])
+		break
 
 
 if __name__ == '__main__':

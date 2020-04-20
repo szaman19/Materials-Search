@@ -20,7 +20,7 @@ class MOFDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        return self.data[idx].data
+        return [self.data[idx].data,self.data[idx].lattice_params, self.data[idx].grid_metadata]
 
     @staticmethod
     def get_data_loader(path: str, batch_size: int):
