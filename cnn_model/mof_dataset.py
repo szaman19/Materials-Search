@@ -20,7 +20,24 @@ class MOFDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        return [self.data[idx].data,self.data[idx].lattice_params, self.data[idx].grid_metadata]
+        dic = {}
+        dic['data'] = self.data[idx].loc_tensor
+        lp = self.data[idx].lattice_params
+        
+        a_mean = 16.5824 
+        b_mean = 18.1350 
+        c_mean = 20.0291
+
+        a_std = 8.6663 
+        b_std = 7.9525
+        c_std = 10.3119
+        mean_tensor = torch.tensor([a_mean, b_mean, c_mean]) 
+        std_tensor = torch.tensor([a_std, b_std, c_std])
+
+        dic['lattice_params'] = [ lp['a'] , lp['b'], lp['c']]
+        dic['lattice_params'] = (torch.tensor(dic['lattice_params']) - mean_tensor ) / std_tensor
+        dic['metadata'] = self.data[idx].grid_metadata
+        return  dic
 
     @staticmethod
     def get_data_loader(path: str, batch_size: int):
@@ -30,14 +47,13 @@ class MOFDataset(Dataset):
             shuffle=True,
         )
 
-
 def main():
-    data_loader = MOFDataset.get_data_loader("../3D_Grid_Data/Test_MOFS.p", 25)
+    data_loader = MOFDataset.get_data_loader("../3D_Grid_Data/Test_MOFS.p", 64)
 
-    batch: int
-    mofs: torch.Tensor
     for batch, mofs in enumerate(data_loader):
-        print(batch, mofs.shape)
+        print(batch, mofs['data'].shape, mofs['lattice_params'].shape)
+
+        break
 
 
 if __name__ == '__main__':
