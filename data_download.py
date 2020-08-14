@@ -11,8 +11,6 @@ def downloader(link, file_name):
 	if (r.status_code == "200"):
 		print("Completed download")
 
-
-
 def main():
 	print('Beginning cif download')
 	url_cif = 'https://zenodo.org/record/3370144/files/2019-07-01-ASR-public_12020.tar?download=1'
