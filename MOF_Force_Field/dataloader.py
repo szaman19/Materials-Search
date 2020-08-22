@@ -45,8 +45,6 @@ class MOFDataset(InMemoryDataset):
             group = group.reset_index(drop=True)
             group['run_atom'] = run_atom
             node_features = group.run_atom.drop_duplicates().values
-            # node_features = group.loc[group.run == run, ['run_atom', 'atom']].sort_values(
-            #     'run_atom').atom.drop_duplicates().values
 
             node_features = torch.LongTensor(node_features).unsqueeze(1)
 
