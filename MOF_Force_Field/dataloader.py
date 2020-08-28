@@ -73,6 +73,7 @@ class MOFDataset(InMemoryDataset):
         # 49988 number of unique runs
 
 
+if __name__ == '__main__':
 dataset = MOFDataset('../')
 
 dataset = dataset.shuffle()
