@@ -12,6 +12,7 @@ class CIFtoTensor(object):
 		super(CIFtoTensor, self).__init__()
 		self.default_atoms = ["H","O", "N", "C", "P", "Cu","Co","Ag","Zn","Cd", "Fe"]
 		
+		
 
 	def get_cif_file(file_name = "AHOKOX_clean.cif"):
 		cif_file = CifParser(file_name)
