@@ -3,12 +3,22 @@ import torch
 from torch_geometric.data import InMemoryDataset
 from tqdm import tqdm
 import math
-import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 
-df = pd.read_csv('FIGXAU_V2.csv',skiprows=1, low_memory=False)
+while True:
+    try:
+        file = input("Enter the name or path of the dataset to read with extension included: ")
+
+        df = pd.read_csv(str(file), skiprows=1, low_memory=False)
+
+    except FileNotFoundError:
+        print("The file you entered does not exist or you entered the name incorrectly.")
+        continue
+    else:
+        break
+
 df.columns = ['atom','x','y','z', 'energy', 'run']
 
 
@@ -44,14 +54,14 @@ class MOFDataset(InMemoryDataset):
             run_atom = LabelEncoder().fit_transform(group.atom)
             group = group.reset_index(drop=True)
             group['run_atom'] = run_atom
-            node_features = group.run_atom.drop_duplicates().values
-
-            node_features = torch.LongTensor(node_features).unsqueeze(1)
-
+            
+            node_features = [[0 for i in range(len(run_atom))] for j in range(len(run_atom))]
+            
             source_nodes = []
             target_nodes = []
             bond_dists = []
             for i in range(len(run_atom)):
+                node_features[i][i] = 1
                 for k in range(len(run_atom)):
                     source_nodes.append(run_atom[i])
                     target_nodes.append(run_atom[k])
@@ -60,11 +70,13 @@ class MOFDataset(InMemoryDataset):
 
             edge_index = torch.tensor([source_nodes, target_nodes], dtype=torch.long)
             edge_attr = torch.tensor([source_nodes, bond_dists], dtype=torch.long)
+            node_features = torch.LongTensor(node_features)
+            
             x = node_features
 
-            y = torch.FloatTensor([group.energy])
+            y = torch.FloatTensor(group.energy.drop_duplicates())
 
-            data = Data(x=x, edge_index=edge_index,edge_attr=edge_attr, y=y)
+            data = Data(x=x, edge_index=edge_index, edge_attr=edge_attr, y=y)
             data_list.append(data)
 
         data, slices = self.collate(data_list)
@@ -80,7 +92,6 @@ one_tenth_length = int(len(dataset) * 0.1)
 train_dataset = dataset[:one_tenth_length * 8]
 val_dataset = dataset[one_tenth_length*8:one_tenth_length * 9]
 test_dataset = dataset[one_tenth_length*9:]
-# print(len(train_dataset), len(val_dataset), len(test_dataset))
 
 batch_size = 512
 train_loader = DataLoader(train_dataset, batch_size=batch_size)
