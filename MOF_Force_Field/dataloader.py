@@ -73,7 +73,6 @@ class MOFDataset(InMemoryDataset):
 
             edge_index = torch.tensor([source_nodes, target_nodes], dtype=torch.long)
             edge_attr = torch.tensor([source_nodes, bond_dists], dtype=torch.long)
-            node_features = torch.LongTensor(node_features)
             
             x = node_features
 
