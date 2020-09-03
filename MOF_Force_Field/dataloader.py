@@ -5,6 +5,7 @@ from tqdm import tqdm
 import math
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 
 while True:
@@ -54,14 +55,16 @@ class MOFDataset(InMemoryDataset):
             run_atom = LabelEncoder().fit_transform(group.atom)
             group = group.reset_index(drop=True)
             group['run_atom'] = run_atom
+            node_features = group.run_atom.values
             
-            node_features = [[0 for i in range(len(run_atom))] for j in range(len(run_atom))]
+            node_features = node_features.reshape(len(node_features), 1)
+            node_features = OneHotEncoder(sparse=False).fit_transform(node_features)
+            node_features = torch.LongTensor(node_features)
             
             source_nodes = []
             target_nodes = []
             bond_dists = []
             for i in range(len(run_atom)):
-                node_features[i][i] = 1
                 for k in range(len(run_atom)):
                     source_nodes.append(run_atom[i])
                     target_nodes.append(run_atom[k])
