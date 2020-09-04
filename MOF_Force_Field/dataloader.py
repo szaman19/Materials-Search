@@ -11,17 +11,18 @@ import pandas as pd
 
 
 class MOFDataset(InMemoryDataset):
-    def __init__(self,
-                 file_name,  
+    def __init__(self, 
+                 file_name, 
                  root, 
                  transform=None, 
                  pre_transform=None):
-        self.df = pd.read_csv(file_name)
+        self.df = pd.read_csv(file_name, skiprows = 1)
+        self.df.columns = ['atom', 'x','y','z','energy','run']
         self.df['x'].replace(' ', np.nan, inplace=True)
         self.df.dropna(subset=['x'], inplace=True)
-        self.df['x'] = df['x'].astype(float)
-        self.df['y'] = df['y'].astype(float)
-        self.df['z'] = df['z'].astype(float)
+        self.df['x'] = self.df['x'].astype(float)
+        self.df['y'] = self.df['y'].astype(float)
+        self.df['z'] = self.df['z'].astype(float)
 
 
         super(MOFDataset, self).__init__(root, transform, pre_transform)
@@ -58,14 +59,14 @@ class MOFDataset(InMemoryDataset):
             target_nodes = []
             bond_dists = []
             for i in range(len(run_atom)):
-                for k in range(len(run_atom)):
+                for k in range(i+1, len(run_atom)):
                     source_nodes.append(run_atom[i])
                     target_nodes.append(run_atom[k])
                     bond_dists.append(math.sqrt(((group.x[i] - group.x[k]) ** 2) + ((group.y[i] - group.y[k]) ** 2) + (
                                 (group.z[i] - group.z[k]) ** 2)))
 
             edge_index = torch.tensor([source_nodes, target_nodes], dtype=torch.long)
-            edge_attr = torch.tensor([source_nodes, bond_dists], dtype=torch.long)
+            edge_attr = torch.tensor([bond_dists], dtype=torch.float).T
             
             x = node_features
 
@@ -80,7 +81,7 @@ class MOFDataset(InMemoryDataset):
         # 49988 number of unique runs
         
 if __name__ == '__main__':
-    dataset = MOFDataset('../')
+    dataset = MOFDataset('FIGXAU_V2.csv','.')
 
     dataset = dataset.shuffle()
     one_tenth_length = int(len(dataset) * 0.1)

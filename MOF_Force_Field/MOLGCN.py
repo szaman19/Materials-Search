@@ -17,12 +17,12 @@ class MOLGCN(MessagePassing):
 	def reset_parameters(self):
 		self.nn.reset_parameters()
 	
-	def forward(self, x, edge_index, edge_attr):
+	def forward(self, x, edge_index, edge_attr, size = None):
 		
 		if isinstance(x, Tensor):
 			x: PairTensor = (x, x)
 
-		out = self.propagate(edge_index, x = x, edge_attr = edge_attr)
+		out = self.propagate(edge_index, x = x, edge_attr = edge_attr, size = size)
 
 		return out 
 
