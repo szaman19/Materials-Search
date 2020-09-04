@@ -8,33 +8,26 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 
-while True:
-    try:
-        file = input("Enter the name or path of the dataset to read with extension included: ")
-
-        df = pd.read_csv(str(file), skiprows=1, low_memory=False)
-
-    except FileNotFoundError:
-        print("The file you entered does not exist or you entered the name incorrectly.")
-        continue
-    else:
-        break
-
-df.columns = ['atom','x','y','z', 'energy', 'run']
-
-
-df['x'].replace(' ', np.nan, inplace=True)
-df.dropna(subset=['x'], inplace=True)
-df['x'] = df['x'].astype(float)
-df['y'] = df['y'].astype(float)
-df['z'] = df['z'].astype(float)
 
 
 class MOFDataset(InMemoryDataset):
-    def __init__(self, root, transform=None, pre_transform=None):
+    def __init__(self,
+                 file_name,  
+                 root, 
+                 transform=None, 
+                 pre_transform=None):
+        self.df = pd.read_csv(file_name)
+        self.df['x'].replace(' ', np.nan, inplace=True)
+        self.df.dropna(subset=['x'], inplace=True)
+        self.df['x'] = df['x'].astype(float)
+        self.df['y'] = df['y'].astype(float)
+        self.df['z'] = df['z'].astype(float)
+
+
         super(MOFDataset, self).__init__(root, transform, pre_transform)
         self.data, self.slices = torch.load(self.processed_paths[0])
-
+        
+        
     @property
     def raw_file_names(self):
         return []
@@ -50,7 +43,7 @@ class MOFDataset(InMemoryDataset):
         data_list = []
 
         # process by run
-        grouped = df.groupby('run')
+        grouped = self.df.groupby('run')
         for run, group in tqdm(grouped):
             run_atom = LabelEncoder().fit_transform(group.atom)
             group = group.reset_index(drop=True)
@@ -87,15 +80,15 @@ class MOFDataset(InMemoryDataset):
         # 49988 number of unique runs
         
 if __name__ == '__main__':
-dataset = MOFDataset('../')
+    dataset = MOFDataset('../')
 
-dataset = dataset.shuffle()
-one_tenth_length = int(len(dataset) * 0.1)
-train_dataset = dataset[:one_tenth_length * 8]
-val_dataset = dataset[one_tenth_length*8:one_tenth_length * 9]
-test_dataset = dataset[one_tenth_length*9:]
+    dataset = dataset.shuffle()
+    one_tenth_length = int(len(dataset) * 0.1)
+    train_dataset = dataset[:one_tenth_length * 8]
+    val_dataset = dataset[one_tenth_length*8:one_tenth_length * 9]
+    test_dataset = dataset[one_tenth_length*9:]
 
-batch_size = 512
-train_loader = DataLoader(train_dataset, batch_size=batch_size)
-val_loader = DataLoader(val_dataset, batch_size=batch_size)
-test_loader = DataLoader(test_dataset, batch_size=batch_size)
+    batch_size = 512
+    train_loader = DataLoader(train_dataset, batch_size=batch_size)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size)
