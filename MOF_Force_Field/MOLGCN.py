@@ -28,7 +28,9 @@ class MOLGCN(MessagePassing):
 
 
 	def message(self, x_i, x_j, edge_attr):
+		
 		z = torch.cat([x_i, x_j, edge_attr], dim = -1)
+		print(z)
 		return self.nn(z)
 
 

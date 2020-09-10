@@ -68,6 +68,8 @@ class MOFDataset(InMemoryDataset):
             edge_index = torch.tensor([source_nodes, target_nodes], dtype=torch.long)
             edge_attr = torch.tensor([bond_dists], dtype=torch.float).T
             
+            edge_attr = (edge_attr - edge_attr.mean())/ (edge_attr.std())
+            edge_attr = torch.exp(-edge_attr) 
             x = node_features
 
             y = torch.FloatTensor(group.energy.drop_duplicates())
