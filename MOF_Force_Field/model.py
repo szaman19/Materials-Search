@@ -25,27 +25,8 @@ class MOF_Net(torch.nn.Module):
         if (mlp):
             self.nn = mlp
         else:
-        	if(input_features):
-	            self.nn = nn.Sequential(
-	                nn.Linear(input_features, 128),
-	                nn.BatchNorm1d(128),
-	                nn.Dropout(.5),
-	                nn.ReLU(),
-	                nn.Linear(128, 64),
-	                nn.BatchNorm1d(64),
-	                nn.Dropout(.5),
-	                nn.ReLU(),
-	                nn.Linear(64, 32),
-	                nn.BatchNorm1d(32),
-	                nn.Dropout(.5),
-	                nn.ReLU(),
-	                nn.Linear(32, 16),
-	                nn.BatchNorm1d(16),
-	                nn.Dropout(.2),
-	                nn.ReLU(),
-	                nn.Linear(16,1))
-	        else:
-	        	raise Exception("Must set one of either input_features or mlp ")
+	        raise Exception("Must set one of either input_features or mlp ")
+               
         self.conv = MOLGCN(self.nn)
     def forward(self, data):
         x, edge_index, batch, edge_attr = data.x, data.edge_index, data.batch, data.edge_attr
@@ -53,7 +34,8 @@ class MOF_Net(torch.nn.Module):
         x = self.conv(x, edge_index, edge_attr)
 #         print(x.shape)
         x = gaddp(x, batch) 
-        x = torch.mean(x, dim=1)
+#         print(x.shape)
+        x = x.squeeze() / 2
 #         print(x.shape)
         return x
 
