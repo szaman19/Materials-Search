@@ -1,8 +1,0 @@
-venv/
-data/
-gcn_model/data/
-__pyc__/
-*.pyc
-*.ics
-*.cif
-*.idea
