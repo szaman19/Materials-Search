@@ -4,61 +4,28 @@ from torch_geometric.data import InMemoryDataset
 from tqdm import tqdm
 import math
 import numpy as np
-from scipy.spatial import distance
-
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
-
 import pandas as pd
-import torch_geometric.utils as data_utils
-
-import ray 
-ray.init()
-
-@ray.remote
-def get_torch_data(df, threshold = 3):
-    atoms = df['atom'].values
-    
-    energy = np.array([-1*df['Energy(Ry)'].values[0]])
-    atoms = np.expand_dims(atoms, axis=1)
-        
-    one_hot_encoding = OneHotEncoder(sparse=False).fit_transform(atoms)
-    coords = df[['x(angstrom)','y(angstrom)','z(angstrom)']].values
-    
-    edge_index = None
-    edge_attr = None
 
 
-    while True:
-        dist = distance.cdist(coords, coords)
-        dist[dist>threshold] = 0
-        dist = torch.from_numpy(dist)
-        edge_index, edge_attr = data_utils.dense_to_sparse(dist)
-        edge_attr = edge_attr.unsqueeze(dim=1).type(torch.FloatTensor)
-        edge_index = torch.LongTensor(edge_index)
-        if (data_utils.contains_isolated_nodes(edge_index, num_nodes = 13)):
-            threshold +=0.5
-        else:
-            break
-
-    x = torch.from_numpy(one_hot_encoding).type(torch.FloatTensor)
-    y = torch.from_numpy(energy).type(torch.FloatTensor)
-    data = Data(x=x, edge_index=edge_index, edge_attr=edge_attr, y=y)
-
-    return data   
 
 class MOFDataset(InMemoryDataset):
     def __init__(self, 
                  file_name, 
                  root, 
                  transform=None, 
-                 pre_transform=None,
-                 pre_filter = None):
-        self.df = pd.read_csv(file_name)
+                 pre_transform=None):
+        self.df = pd.read_csv(file_name, skiprows = 1)
+        self.df.columns = ['atom', 'x','y','z','energy','run']
+        self.df['x'].replace(' ', np.nan, inplace=True)
+        self.df.dropna(subset=['x'], inplace=True)
+        self.df['x'] = self.df['x'].astype(float)
+        self.df['y'] = self.df['y'].astype(float)
+        self.df['z'] = self.df['z'].astype(float)
 
-        super(MOFDataset, self).__init__(root, transform, pre_transform, pre_filter)
-        self.pre_filter = pre_filter 
 
+        super(MOFDataset, self).__init__(root, transform, pre_transform)
         self.data, self.slices = torch.load(self.processed_paths[0])
         
         
@@ -79,13 +46,37 @@ class MOFDataset(InMemoryDataset):
         # process by run
         grouped = self.df.groupby('run')
         for run, group in tqdm(grouped):
+            run_atom = LabelEncoder().fit_transform(group.atom)
             group = group.reset_index(drop=True)
-            data_list.append(get_torch_data.remote(group[1:]))
+            group['run_atom'] = run_atom
+            node_features = group.run_atom.values
+            
+            node_features = node_features.reshape(len(node_features), 1)
+            node_features = OneHotEncoder(sparse=False).fit_transform(node_features)
+            node_features = torch.LongTensor(node_features)
+            
+            source_nodes = []
+            target_nodes = []
+            bond_dists = []
+            for i in range(len(run_atom)):
+                for k in range(i+1, len(run_atom)):
+                    source_nodes.append(run_atom[i])
+                    target_nodes.append(run_atom[k])
+                    bond_dists.append(math.sqrt(((group.x[i] - group.x[k]) ** 2) + ((group.y[i] - group.y[k]) ** 2) + (
+                                (group.z[i] - group.z[k]) ** 2)))
 
-        data_list = ray.get(data_list)
-        
-        if(self.pre_filter):
-            data_list = [x for x in data_list if self.pre_filter(x)]
+            edge_index = torch.tensor([source_nodes, target_nodes], dtype=torch.long)
+            edge_attr = torch.tensor([bond_dists], dtype=torch.float).T
+            
+            edge_attr = (edge_attr - edge_attr.mean())/ (edge_attr.std())
+            edge_attr = torch.exp(-edge_attr) 
+            x = node_features
+
+            y = torch.FloatTensor(group.energy.drop_duplicates())
+
+            data = Data(x=x, edge_index=edge_index, edge_attr=edge_attr, y=y)
+            data_list.append(data)
+
         data, slices = self.collate(data_list)
         torch.save((data, slices), self.processed_paths[0])
 
