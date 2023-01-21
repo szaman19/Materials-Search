@@ -11,7 +11,7 @@ class MOLGCN(MessagePassing):
 	def __init__(self,
 				 nn, 
 				 aggr = 'add',
-				 learn_input = True,
+				 learn_input = False,
 				 feature_size = 4,
 				 **kwargs):
 		super(MOLGCN, self).__init__()
@@ -20,11 +20,6 @@ class MOLGCN(MessagePassing):
 		self.learn_input = learn_input
 
 		self.bond_representation_learner = None
-		if (self.learn_input):
-			self.bond_network = neural_net.Sequential(
-								neural_net.Linear(2 * feature_size,4),
-
-								)
 
 
 

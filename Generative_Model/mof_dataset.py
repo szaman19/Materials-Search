@@ -49,3 +49,13 @@ def main():
 
 if __name__ == '__main__':
     main()
+model = None
+saved_model = Path("AE_MODEL_FULL.p")
+if (saved_model.is_file()):
+    print("Loading Saved Model")
+    model = torch.load("AE_MODEL_FULL.p")
+else:
+    model = AE.ConvolutionalAE(2048, 11)
+
+if cuda:
+    model.cuda()
