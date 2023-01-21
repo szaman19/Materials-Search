@@ -1,4 +1,6 @@
 import requests 
+import tarfile
+
 
 
 def downloader(link, file_name):
@@ -16,7 +18,11 @@ def main():
 	url_cif = 'https://zenodo.org/record/3677685/files/2019-11-01-ASR-public_12020.tar.gz?download=1'
 	cif_tar_name = '2019-11-01-ASR-public_12020.tar.gz'
 	downloader(url_cif, cif_tar_name)
-	
+
+	tar = tarfile.open(cif_tar_name	, "r:gz")
+	tar.extractall()
+	tar.close()
+
 	print('Beginning csv download')
 	url_csv = "https://zenodo.org/record/3677685/files/2019-11-01-ASR-public_12020.csv?download=1"
 	csv_name = "2019-11-01-ASR-public_12020.csv"
