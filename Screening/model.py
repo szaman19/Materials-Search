@@ -29,6 +29,7 @@ class LitModel(pl.LightningModule):
     grid, y = batch
     y_hat = self(grid)
     loss = F.mse_loss(y_hat, y.unsqueeze(1).float())
+    self.log('train_loss', loss)
     self.log("train/loss", loss, prog_bar=True)
     return loss
   

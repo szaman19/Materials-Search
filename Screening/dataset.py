@@ -9,9 +9,12 @@ import pandas
 import torch
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, grid_file, link_file, csv, feature):
+    def __init__(self, grid_file, link_file, csv, feature, mapping=None):
         super().__init__()
         self.grids = np.load(grid_file)
+        if mapping:
+            for i in range(len(self.grids)):
+                self.grids[i] = mapping(self.grids[i])
         self.labels = np.zeros(len(self.grids))
         with open(link_file) as f:
             links = f.read().split()

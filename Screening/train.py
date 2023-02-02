@@ -41,20 +41,20 @@ def train(dataset, hparams):
     validation_loader = DataLoader(validation_set, batch_size = 256, pin_memory=True, num_workers=4)
     test_loader = DataLoader(test_set, batch_size = 256,  pin_memory=True, num_workers=4)
     model = LitModel(num_layers=10)
-    csv_logger = pl.loggers.CSVLogger("./lightning_logs")
+    wandb_logger = WandbLogger(project="materials_resnet")
     chk_pt_dir = "./chkpts"
     checkpoint_callback = ModelCheckpoint(dirpath=chk_pt_dir, save_top_k=2, monitor="val_loss")
     trainer = pl.Trainer(
-            logger = csv_logger,
+            logger = wandb_logger,
             accelerator='gpu',
             devices="auto",
             max_epochs=200,
             enable_model_summary=True,
-            log_every_n_steps=5,
+            # log_every_n_steps=5,
             strategy=DDPStrategy(find_unused_parameters=False),
             gradient_clip_val=2,
             track_grad_norm=2,
-            val_check_interval=.5,
+            # val_check_interval=.5,
             limit_val_batches=50,
             enable_checkpointing=True,
             callbacks=[checkpoint_callback],
