@@ -25,8 +25,10 @@ class BasicModel(nn.Module):
             nn.MaxPool3d(kernel_size=2, stride=2),
             nn.Dropout(p=0.02))
         # 4^3x32 (2048) -> 64
-        self.fc1 = nn.Linear(4**3*32, 64)
-        nn.init.xavier_uniform_(self.fc1.weight)
+        self.fc1 = nn.Sequential(
+            # nn.BatchNorm1d(4**3*32),
+            nn.Linear(4**3*32, 64)
+        )
         # 64 -> 1
         self.fc2 = nn.Linear(64, 1)
         nn.init.xavier_uniform_(self.fc2.weight)
