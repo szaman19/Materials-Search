@@ -26,8 +26,8 @@ class BasicModel(nn.Module):
             nn.Dropout(p=0.02))
         # 4^3x32 (2048) -> 64
         self.fc1 = nn.Sequential(
-            # nn.BatchNorm1d(4**3*32),
-            nn.Linear(4**3*32, 64)
+            nn.Linear(4**3*32, 64),
+            nn.BatchNorm1d(64),
         )
         # 64 -> 1
         self.fc2 = nn.Linear(64, 1)
