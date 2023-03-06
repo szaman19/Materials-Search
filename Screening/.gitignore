@@ -1,2 +1,3 @@
 *.npy
+*.pt
 lightning_extras.txt

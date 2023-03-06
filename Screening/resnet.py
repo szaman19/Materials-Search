@@ -19,7 +19,7 @@ class Bridge(nn.Module):
                     nn.Conv3d(outchannels if i else inchannels, outchannels, kernel_size = 3, stride = stride, padding = 1),
                     nn.BatchNorm3d(outchannels),
                     nn.ReLU(),
-                    nn.Dropout(p=0.01),
+                    nn.Dropout(p=0.5),
                 )
                 for i in range(depth-1)
             ],
@@ -31,7 +31,7 @@ class Bridge(nn.Module):
         )
 
     def forward(self, x):
-        out = self.direct(x)/2
+        out = self.direct(x)
         out = out + x if self.downsample == None else self.downsample(x)
         out = self.end(out)
         return out
