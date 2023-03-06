@@ -4,10 +4,10 @@ import torch.nn as nn
 from torch.nn.functional import pad
 
 class BasicModel(nn.Module):
-    def __init__(self, features=1, channels=1, depth=32):
+    def __init__(self, features=1, channels=1, depth=32, dropout=0.2):
         super(BasicModel, self).__init__()
         pad = dict(padding='same', padding_mode='circular')
-        p = 0.2
+        p = dropout
         n = depth
         # 32^3 -> 16^3x32
         self.layer1 = nn.Sequential(
