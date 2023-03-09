@@ -19,50 +19,43 @@ def df_features(df, feature):
         val = df[feature][index]
         yield filename, val
 
-def load_features(feature_names, lattice_file, csv_file, file_indexes):
+def load_features(feature_names, lattice_file, csv_file):
     feature_map = defaultdict(list)
-    lattice = np.load(lattice_file) if "lattice" in feature_names else None
+    lattice_map = np.load(lattice_file, allow_pickle=True).item() if "lattice" in feature_names else None
     df = pandas.read_csv(csv_file)
     for feature_name in feature_names:
         if feature_name == "lattice":
-            for i, file in enumerate(file_indexes):
-                assert i == file_indexes[file]
-                feature_map[file].extend(lattice[i])
+            for filename, lattice in lattice_map.items():
+                feature_map[filename].extend(lattice)
         else:
             for filename, feature in df_features(df, feature_name):
                 feature_map[filename].append(feature)
     return feature_map
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, grid_file, link_file, csv_file, lattice_file, feature_names, mapping=None):
+    def __init__(self, grid_file, csv_file, lattice_file, feature_names, transform=lambda x: x):
         super().__init__()
-        grids = list(np.float32(np.load(grid_file)))
-        if mapping:
-            grids = [mapping(x) for x in grids]
+        grid_map = np.load(grid_file, allow_pickle=True).item()
+        grid_names = grid_map.keys()
+        grids = [np.float32(transform(grid_map[x])) for x in grid_names]
         self.grids = np.array(grids)
-        with open(link_file) as f:
-            links = f.read().split()
-        truth = {}
-        for idx, link in enumerate(links):
-            truth[link] = idx
+        
         feature_names = feature_names.split()
-        feature_values = [None]*len(grids)
-        feature_map = load_features(feature_names, lattice_file, csv_file, truth)
-        print("available features:", len(feature_map), "available grids:", len(truth))
-        missing_grids = 0
-        feature_size = 0
-        for filename, features in feature_map.items():
-            # assert(len(features) == len(feature_names))
-            if filename not in truth:
-                missing_grids += 1
-                continue
-            feature_values[truth[filename]] = np.array(features)
-            if feature_size:
+        feature_map = load_features(feature_names, lattice_file, csv_file)
+        print("available features:", len(feature_map), "available grids:", len(grid_map))
+        missing_features = 0
+        feature_size = len(next(iter(feature_map.values())))
+        feature_values = []
+        for filename in grid_names:
+            if filename in feature_map:
+                features = feature_map[filename]
                 assert(len(features) == feature_size)
+                feature_values.append(np.array(features))
             else:
-                feature_size = len(features)
+                missing_features += 1
+                feature_values.append(np.zeros(feature_size))
         self.labels = np.array(feature_values)
-        print(missing_grids, "missing grids")            
+        print(missing_features, "missing features")            
             
     def __len__(self):
         return len(self.grids)

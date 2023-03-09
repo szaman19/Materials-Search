@@ -4,6 +4,7 @@ import os
 import numpy as np
 from tqdm import tqdm
 from pathlib import Path
+import click
 
 from grid_generator import calculate_supercell_coords, GridGenerator
 from torch import Tensor
@@ -37,46 +38,44 @@ def load_probability(unit_cell_coords, lattice, position_supercell_threshold: fl
     torch_coords = torch.from_numpy(super_cell_coords).float()
     return GridGenerator(32, position_variance).calculate(torch_coords, a, b, c, transformation_matrix)
 
+def cif_probability(file):
+    parser = CifParser(file)
+    structures = parser.get_structures(primitive=False)
+    assert len(structures) == 1
+    structure = structures[0]
+    lattice = structure.lattice
+
+    structure2 = structure.copy()
+    structure2.remove_species(['H', 'C', 'N', 'P', 'O'])
+    structure.remove_species(structure2.species)
+    coords1 = structure.frac_coords
+    coords2 = structure2.frac_coords
+    if len(coords1) == 0 or len(coords2) == 0:
+        print(filename)
+        return
+    organics = load_probability(coords1, lattice, 0.4, 0.2)
+    metals = load_probability(coords2, lattice, 0.4, 0.2)
+    return organics, metals
+
 def data_parser():
-    names = Path("data/grids.link").read_text().split("\n")
-    link = {x: i for i, x in enumerate(names)}
-    energy_grids = np.load("data/grids.npy")
-    output = np.zeros([len(names), 3, 32, 32, 32])
-    output[:, 1:2] = energy_grids
-    for j, filename in enumerate(tqdm(names)):
-        f = os.path.join(directory, (filename+'.cif'))
-        if os.path.isfile(f):
-            parser = CifParser(f)
-            structures = parser.get_structures(primitive=False)
-            assert len(structures) == 1
-            structure = structures[0]
-            lattice = structure.lattice
+    energy_grids = np.load("data/grids.npy", allow_pickle=True).item()
+    grouped_grids = {}
+    for filename in tqdm(energy_grids):
+        data = np.zeros([3, 32, 32, 32])
+        f = Path(directory, filename+'.cif')
+        if not f.is_file():
+            print("Could not find", filename)
+            continue
+        organics, metals = cif_probability(f)
+        data[0] = energy_grids[filename]
+        data[1] = organics
+        data[2] = metals
+        grouped_grids[filename] = data
 
-            structure2 = structure.copy()
-            structure2.remove_species(['H', 'C', 'N', 'P', 'O'])
-            structure.remove_species(structure2.species)
-            coords1 = structure.frac_coords
-            coords2 = structure2.frac_coords
-            if len(coords1) == 0 or len(coords2) == 0:
-                print(filename)
-                continue
-            p_grid1 = load_probability(coords1, lattice, 0.4, 0.2)
-            p_grid2 = load_probability(coords2, lattice, 0.4, 0.2)
-            output[j, 0] = p_grid1
-            output[j, 1] = p_grid2
-        else:
-            print("Could not find", name)
-
-    out = np.array(output)
-    np.save("data/probability", out)
+    np.save("data/probability", grouped_grids)
 
     print("Completed")
 
-
-# out = read_grids_from(directory2)
-#
-# with open(f'energy_grids_2_8.pt', 'wb+') as f:
-#     torch.save(out, f)
-# print()
-data_parser()
+if __name__ == "__main__":
+    data_parser()
 
