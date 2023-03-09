@@ -13,22 +13,6 @@ from torch import Tensor
 directory2 = '/home/szaman5/Materials-Search/data/energy_grids/'
 directory = '/home/szaman5/Materials-Search/data/structure_10143/'
 
-
-def read_grids_from(directory, size=32, N=1):
-    i = 0
-    files = os.listdir(directory)
-    grids = np.zeros([len(files), N]+[size]*3, dtype=np.float32)
-    for file in files:
-        if i%(size**3):
-            print("Unexpected index:", i)
-        with open(directory+file) as f:
-            for line in f:
-                for num in line.split()[-N:]:
-                    grids.flat[i] = float(num)
-                    i+=1
-    return grids
-
-
 def load_probability(unit_cell_coords, lattice, position_supercell_threshold: float, position_variance: float) -> Tensor:
     transformation_matrix = lattice.matrix.copy()
     a, b, c = lattice.abc
@@ -51,8 +35,8 @@ def cif_probability(file):
     coords1 = structure.frac_coords
     coords2 = structure2.frac_coords
     if len(coords1) == 0 or len(coords2) == 0:
-        print(filename)
-        return
+        print(file)
+        return None, None
     organics = load_probability(coords1, lattice, 0.4, 0.2)
     metals = load_probability(coords2, lattice, 0.4, 0.2)
     return organics, metals
@@ -67,6 +51,8 @@ def data_parser():
             print("Could not find", filename)
             continue
         organics, metals = cif_probability(f)
+        if organics == None:
+            continue
         data[0] = energy_grids[filename]
         data[1] = organics
         data[2] = metals

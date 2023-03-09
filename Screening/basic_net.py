@@ -46,7 +46,6 @@ class BasicModel(nn.Module):
             nn.BatchNorm1d(64),
             nn.Dropout(p),
             nn.Linear(64, features),
-            nn.ReLU(),
         )
         for layer in self.fc:
             if type(layer) == nn.Linear:

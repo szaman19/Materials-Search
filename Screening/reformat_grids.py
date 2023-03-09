@@ -8,14 +8,13 @@ from pymatgen.io.cif import CifParser
 
 import numpy as np
 
-def read_grids(files, size=32, N=1):
+def read_grids(files, size=32):
     grids = {}
     for file in tqdm(files, desc="reading grids"):
         with open(file) as f:
-            grid = np.zeros([N]+[size]*3, dtype=np.float32)
-            for line in f:
-                for i, num in enumerate(line.split()[-N:]):
-                    grid.flat[i] = float(num)
+            grid = np.zeros([1]+[size]*3, dtype=np.float32)
+            for i, line in enumerate(f):
+                grid.flat[i] = float(line.split()[-1])
             grids[Path(file).stem] = grid
     return grids
 
@@ -50,11 +49,13 @@ def reformat(directory, to_file):
 @click.argument('directory', default='./', type=click.Path(exists=True))
 @click.argument('cif-directory', default='./', type=click.Path(exists=True))
 @click.argument('name', default='grids', type=click.Path())
-@click.option('--skip', '-s', is_flag=True)
-def main(directory, cif_directory, name, skip):
-    if not skip:
+@click.option('--skip-energy', is_flag=True)
+@click.option('--skip-latice', is_flag=True)
+def main(directory, cif_directory, name, skip_energy, skip_lattice):
+    if not skip_energy:
         reformat(directory, name)
-    lattice(cif_directory, name)
+    if not skip_lattice:
+        lattice(cif_directory, name)
 
 if __name__ == "__main__":
     main()
