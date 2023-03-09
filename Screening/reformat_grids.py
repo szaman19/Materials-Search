@@ -40,6 +40,10 @@ def lattice(to_file, cif_dir, truth):
     np.save(to_file + ".lattice", features)
 
 def reformat(directory, to_file):
+    """Reformat ascii-based grids in directory to a .npy file and .link file
+    
+    The .link file contains the names of all cifs in the order they appear in the .npy file
+    """
     files = glob.glob("*.grid", root_dir=directory)
     names = [x.rsplit(".", 1)[0] for x in files]
     files = [os.path.join(directory, x) for x in files]

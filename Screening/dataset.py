@@ -9,23 +9,21 @@ import numpy as np
 import pandas
 import torch
 
-def matched_features(csv, truth):
-    features = np.zeros(len(truth))
+def matched_features(csv, feature, truth):
+    features = np.zeros((len(truth), 1))
     df = pandas.read_csv(csv)
-    missed = 0
+    filenames = []
     for index in df.index:
         filename = df['filename'][index]
         if filename not in truth:
-            missed += 1
-            # print(filename, "not found")
             continue
         idx = truth[filename]
-        self.labels[idx] = df[feature][index]
-    print("missed", missed)
-    return features
+        features[idx, 0] = df[feature][index]
+        filenames.append(filename)
+    return features, filenames
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, grid_file, link_file, csv_lattice, feature, mapping=None):
+    def __init__(self, grid_file, link_file, csv_file, lattice_file, feature, mapping=None):
         super().__init__()
         grids = list(np.float32(np.load(grid_file)))
         if mapping:
@@ -37,9 +35,9 @@ class Dataset(torch.utils.data.Dataset):
         for idx, link in enumerate(links):
             truth[link] = idx
         if feature == "lattice":
-            self.labels = np.load(csv_lattice)
+            self.labels = np.load(lattice_file)
         else:
-            self.labels = matched_features(csv_cif, truth)
+            self.labels, filenames = matched_features(csv_file, feature, truth)
             
     def __len__(self):
         return len(self.grids)

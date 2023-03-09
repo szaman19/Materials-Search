@@ -1,3 +1,4 @@
+import math
 
 import torch
 import torch.nn as nn
@@ -13,11 +14,13 @@ class BasicModel(nn.Module):
         self.layer1 = nn.Sequential(
             nn.Conv3d(channels, n, kernel_size=5, stride=1, **pad),
             nn.ReLU(),
+            # nn.Conv3d(n // 2, n, kernel_size=3, stride=1, dilation=2, **pad),
+            # nn.ReLU(),
             # nn.Conv3d(8, n, kernel_size=3, stride=1, dilation=2, **pad),
             # nn.ReLU(),
             nn.MaxPool3d(kernel_size=2, stride=2),
             # nn.BatchNorm3d(n),
-            # nn.Dropout(p)
+            nn.Dropout(p),
         )
         # 16^3x32 -> 8^3x32
         self.layer2 = nn.Sequential(
@@ -40,8 +43,13 @@ class BasicModel(nn.Module):
             # nn.BatchNorm1d(4**3*n),
             nn.Linear(4**3*n, 64),
             nn.BatchNorm1d(64),
+            nn.Dropout(p),
             nn.Linear(64, features),
         )
+        for layer in self.fc:
+            if type(layer) == nn.Linear:
+                nn.init.xavier_uniform_(layer.weight)
+
     
     def forward(self, x):
         out = self.layer1(x)
