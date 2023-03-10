@@ -44,14 +44,14 @@ class Dataset(torch.utils.data.Dataset):
         feature_map = load_features(feature_names, lattice_file, csv_file)
         print("available features:", len(feature_map), "available grids:", len(grid_map))
         missing_features = 0
-        feature_size = len(next(iter(feature_map.values())))
+        feature_size = max(*(len(x) for x in feature_map.values()))
         feature_values = []
         for filename in grid_names:
-            if filename in feature_map:
-                features = feature_map[filename]
-                assert(len(features) == feature_size)
+            features = feature_map.get(filename, [])
+            if len(features) == feature_size:
                 feature_values.append(np.array(features))
             else:
+                print(f"Only {len(features)}/{feature_size} features for {filename}")
                 missing_features += 1
                 feature_values.append(np.zeros(feature_size))
         self.labels = np.array(feature_values)

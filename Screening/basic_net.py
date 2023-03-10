@@ -12,10 +12,10 @@ class BasicModel(nn.Module):
         n = depth
         # 32^3 -> 16^3x32
         self.layer1 = nn.Sequential(
-            nn.Conv3d(channels, n // 2, kernel_size=5, stride=1, **pad, padding_mode='circular'),
+            nn.Conv3d(channels, n, kernel_size=5, stride=1, **pad, padding_mode='circular'),
             nn.ReLU(),
-            nn.Conv3d(n // 2, n, kernel_size=3, stride=1, dilation=2, **pad),
-            nn.ReLU(),
+            # nn.Conv3d(n // 2, n, kernel_size=3, stride=1, dilation=2, **pad),
+            # nn.ReLU(),
             # nn.Conv3d(8, n, kernel_size=3, stride=1, dilation=2, **pad),
             # nn.ReLU(),
             nn.MaxPool3d(kernel_size=2, stride=2),
