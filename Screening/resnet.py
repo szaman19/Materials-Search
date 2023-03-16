@@ -41,8 +41,7 @@ class ResNet3d(nn.Module):
         super(ResNet3d, self).__init__()
         assert(len(depths) == len(channels)-1)
         layers = []
-        prev = channels[0]
-        for depth, curr in zip(depths, channels[1:]):
+        for depth, prev, curr in zip(depths, channels[:-1], channels[1:]):
             bridge = Bridge(depth, prev, curr)
             layers.append(bridge)
             prev = curr

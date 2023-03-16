@@ -2,7 +2,6 @@
 import glob
 import sys
 from pathlib import Path
-from pymatgen.io.cif import CifParser
 from collections import defaultdict
 
 import click
