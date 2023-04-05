@@ -46,6 +46,10 @@ class ResNet3d(nn.Module):
             layers.append(bridge)
             prev = curr
         self.net = nn.Sequential(*layers)
+        
+        for m in self.modules():
+            if isinstance(m, nn.Conv3d):
+                m.weight = nn.init.kaiming_normal_(m.weight, mode='fan_out')
 
     def forward(self, x):
         return self.net(x)

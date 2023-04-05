@@ -32,7 +32,7 @@ def load_features(feature_names, lattice_file, csv_file):
     return feature_map
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, grid_file, csv_file, lattice_file, feature_names, transform=lambda x: x):
+    def __init__(self, grid_file, csv_file, lattice_file, feature_names, transform=lambda x: x, transform_labels=lambda x: x):
         super().__init__()
         grid_map = np.load(grid_file, allow_pickle=True).item()
         grid_names = grid_map.keys()
@@ -53,6 +53,7 @@ class Dataset(torch.utils.data.Dataset):
                 print(f"Only {len(features)}/{feature_size} features for {filename}")
                 missing_features += 1
                 feature_values.append(np.zeros(feature_size))
+        feature_values = [transform_labels(x) for x in feature_values]
         self.labels = np.array(feature_values)
         print(missing_features, "missing features")            
             

@@ -13,6 +13,15 @@ class ReLog(nn.Module):
         super(ReLog, self).__init__()
     def forward(self, x):
         return relog(x)
+
+def bilog(x):
+    return torch.log(1 + x.abs()).copysign(x)
+
+class BiLog(nn.Module):
+    def __init__(self):
+        super(BiLog, self).__init__()
+    def forward(self, x):
+        return bilog(x)
     
 class BasicModel(nn.Module):
     def __init__(self, features=1, channels=1, depth=32, dropout=0.2):
