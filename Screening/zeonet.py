@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.nn.functional import pad
 
 class BasicModel(nn.Module):
-    def __init__(self, features=1, channels=1, dropout=0.2):
+    def __init__(self, features=1, channels=1, dropout=0.5):
         super(BasicModel, self).__init__()
         pad = dict(padding='same')
         p = dropout

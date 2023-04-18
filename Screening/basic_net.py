@@ -36,11 +36,12 @@ class BasicModel(nn.Module):
             nn.ReLU(),
             nn.BatchNorm1d(64),
             nn.Dropout(p),
-            nn.Linear(64, features),
         )
+        self.final = nn.Linear(64, features)
         for layer in self.fc:
             if type(layer) == nn.Linear:
                 nn.init.xavier_uniform_(layer.weight)
+        nn.init.xavier_uniform_(self.final.weight)
 
     
     def forward(self, x):
@@ -49,4 +50,5 @@ class BasicModel(nn.Module):
         out = self.layer3(out)
         out = out.view(out.size(0), -1)
         out = self.fc(out)
+        out = self.final(out)
         return out
