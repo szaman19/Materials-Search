@@ -16,12 +16,11 @@ from basic_net import BasicModel
 # Everything starts in the main() function
 
 def filter_data(x):
+    # Clip anything below a and above b, map the range to -1 to 1
     a, b = -4000, 5000
     mid = (a + b)/2
     dif = b-a
-    # energy = x[0]
     energy = np.clip(x[0] - mid, a - mid, b - mid) / (dif / 2)
-    # return np.array([x[1], x[2]])
     return np.array([energy, x[1], x[2]])
 
 
@@ -35,20 +34,17 @@ def load_datasets(
     feature = "lattice",
     seed=42
 ):
+    # create training, validation, and test dataloaders of 90%, 5%, and 5% of data
     dataset = MOFdata.Dataset(grid_file, csv_file, lattice_file, feature, transform=filter_data, transform_labels=filter_labels)
     train_set_size = int(.9 * len(dataset))
     validation_set_size = int(.05 * len(dataset))
     test_set_size = len(dataset) - train_set_size - validation_set_size
-    # TODO: remove
-    # train_set_size = 256
-    # remaining_size = len(dataset) - train_set_size - validation_set_size - test_set_size
-    # print("REMAINING:", remaining_size)
+    
     train_set, validation_set, test_set = random_split(
         dataset=dataset,
         lengths=(train_set_size,
         validation_set_size,
         test_set_size,
-        # remaining_size,
         ),
         generator=torch.Generator().manual_seed(seed))
 
@@ -60,22 +56,21 @@ def load_datasets(
 
 
 def loss_fn(output, target):
+    ### Just MSE loss, can be changed in every place it is used easily here
     return nn.functional.mse_loss(output, target)
 
 def proportional_loss(output, target):
+    ### A loss function for determining relative distance of output to target
     return torch.mean(torch.abs(output-target)/torch.abs(target))
 
-# define the LightningModule
 class ModulePL(pl.LightningModule):
+    ### the LightningModule for training
     def __init__(self, features=3, channels=3, dropout=0.2, device=None):
         super().__init__()
         self.save_hyperparameters()
         self.model = BasicModel(features=features, channels=channels, dropout=dropout)
-        # self.saved_model = saved_model
         self.activations = {}
         for name, child in self.model.named_children():
-            # print(name, child)
-            # break
             child.register_forward_hook(self.get_activation(name))
     
     def forward(self, x):
@@ -83,7 +78,9 @@ class ModulePL(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
+        # forward step
         y_hat = self.forward(x)
+        # loss (backprop done by pytorch-lightning)
         loss = loss_fn(y.float(), y_hat)
         self.log("train_loss", loss)
         return loss
@@ -101,11 +98,12 @@ class ModulePL(pl.LightningModule):
         loss = loss_fn(y_hat, y)
         l1_loss = nn.functional.l1_loss(y_hat, y)
 
+        # log various types of loss
         self.log('validation_loss', loss)
         self.log('validation_l1_loss', l1_loss)
         self.log('validation_p_loss', proportional_loss(y_hat, y))
-        # if not self.global_step % 1000:
         for name, values in self.activations.items():
+            # log activations
             self.log(f'activations/{name}-max', torch.max(torch.abs(values)).item())
         return loss
 
@@ -128,6 +126,7 @@ def main():
     # get dataloaders for each dataset
     train_loader, validation_loader, test_loader = load_datasets()
 
+    # set up logging and checkpoints
     wandb_logger = WandbLogger(project="lattice", log_model="all")
     chkpt_dir = "./lattice_pt"
     checkpoint_callback = ModelCheckpoint(dirpath=chkpt_dir, save_top_k=2, monitor="validation_loss")
