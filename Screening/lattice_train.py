@@ -10,6 +10,11 @@ import pytorch_lightning as pl
 import numpy as np
 import dataset as MOFdata
 
+import random
+from basic_net import BasicModel
+
+# Everything starts in the main() function
+
 def filter_data(x):
     a, b = -4000, 5000
     mid = (a + b)/2
@@ -23,46 +28,36 @@ def filter_data(x):
 def filter_labels(x):
     return x[:3]
 
-grid_file = "data/probability.npy"
-csv_file = "data/ASR.csv"
-lattice_file = "data/grids.lattice.npy"
-feature = "lattice"
+def load_datasets(
+    grid_file = "data/probability.npy",
+    csv_file = "data/ASR.csv",
+    lattice_file = "data/grids.lattice.npy",
+    feature = "lattice",
+    seed=42
+):
+    dataset = MOFdata.Dataset(grid_file, csv_file, lattice_file, feature, transform=filter_data, transform_labels=filter_labels)
+    train_set_size = int(.9 * len(dataset))
+    validation_set_size = int(.05 * len(dataset))
+    test_set_size = len(dataset) - train_set_size - validation_set_size
+    # TODO: remove
+    # train_set_size = 256
+    # remaining_size = len(dataset) - train_set_size - validation_set_size - test_set_size
+    # print("REMAINING:", remaining_size)
+    train_set, validation_set, test_set = random_split(
+        dataset=dataset,
+        lengths=(train_set_size,
+        validation_set_size,
+        test_set_size,
+        # remaining_size,
+        ),
+        generator=torch.Generator().manual_seed(seed))
 
-dataset = MOFdata.Dataset(grid_file, csv_file, lattice_file, feature, transform=filter_data, transform_labels=filter_labels)
-train_set_size = int(.9 * len(dataset))
-validation_set_size = int(.05 * len(dataset))
-test_set_size = len(dataset) - train_set_size - validation_set_size
-# TODO: remove
-# train_set_size = 256
-# remaining_size = len(dataset) - train_set_size - validation_set_size - test_set_size
-# print("REMAINING:", remaining_size)
-train_set, validation_set, test_set = random_split(
-    dataset=dataset,
-    lengths=(train_set_size,
-    validation_set_size,
-    test_set_size,
-    # remaining_size,
-    ),
-    generator=torch.Generator().manual_seed(42))
+    loader_args = dict(batch_size=64, num_workers=4)
+    train_loader = DataLoader(train_set, **loader_args)
+    validation_loader = DataLoader(validation_set, **loader_args)
+    test_loader = DataLoader(test_set, **loader_args)
+    return train_loader, validation_loader, test_loader
 
-loader_args = dict(batch_size=64, num_workers=4)
-train_loader = DataLoader(train_set, **loader_args)
-validation_loader = DataLoader(validation_set, **loader_args)
-test_loader = DataLoader(test_set, **loader_args)
-
-a = np.min(train_set[0][0])
-b = np.max(train_set[0][0])
-small = 0
-for x, _ in train_set:
-    a = min(a, np.min(x))
-    b = max(b, np.max(x))
-print("small grids", small, len(train_set))
-print("data shape", train_set[0][0].shape)
-print("feature shape", train_set[0][1].shape, train_set[0][1])
-print("data range", a, "->", b)
-
-import random
-from zeonet import BasicModel
 
 def loss_fn(output, target):
     return nn.functional.mse_loss(output, target)
@@ -72,7 +67,7 @@ def proportional_loss(output, target):
 
 # define the LightningModule
 class ModulePL(pl.LightningModule):
-    def __init__(self, features=3, channels=3, dropout=0.5, device=None):
+    def __init__(self, features=3, channels=3, dropout=0.2, device=None):
         super().__init__()
         self.save_hyperparameters()
         self.model = BasicModel(features=features, channels=channels, dropout=dropout)
@@ -122,29 +117,36 @@ class ModulePL(pl.LightningModule):
         # return optimizer
 
 
-model = ModulePL()
+def main():
+    model = ModulePL()
 
-# set up trainer
-import wandb
-from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.callbacks import ModelCheckpoint
+    # set up trainer
+    import wandb
+    from pytorch_lightning.loggers import WandbLogger
+    from pytorch_lightning.callbacks import ModelCheckpoint
+    
+    # get dataloaders for each dataset
+    train_loader, validation_loader, test_loader = load_datasets()
 
-wandb_logger = WandbLogger(project="lattice", log_model="all")
-chkpt_dir = "./lattice_pt"
-checkpoint_callback = ModelCheckpoint(dirpath=chkpt_dir, save_top_k=2, monitor="validation_loss")
+    wandb_logger = WandbLogger(project="lattice", log_model="all")
+    chkpt_dir = "./lattice_pt"
+    checkpoint_callback = ModelCheckpoint(dirpath=chkpt_dir, save_top_k=2, monitor="validation_loss")
 
-wandb_logger.watch(model.model)
-# train
-trainer = pl.Trainer(
-    logger = wandb_logger,
-    limit_train_batches=100,
-    limit_val_batches=10,
-    max_epochs=100,
-    gradient_clip_val=0.5,
-    track_grad_norm=2,
-    accelerator='gpu',
-    callbacks=[checkpoint_callback],
-)
+    wandb_logger.watch(model.model)
+    # train
+    trainer = pl.Trainer(
+        logger = wandb_logger,
+        limit_train_batches=100,
+        limit_val_batches=10,
+        max_epochs=100,
+        gradient_clip_val=0.5,
+        track_grad_norm=2,
+        accelerator='gpu',
+        callbacks=[checkpoint_callback],
+    )
 
-# train the model
-trainer.fit(model=model, train_dataloaders=train_loader,  val_dataloaders=validation_loader)
+    # train the model
+    trainer.fit(model=model, train_dataloaders=train_loader,  val_dataloaders=validation_loader)
+
+if __name__ == "__main__":
+    main()
